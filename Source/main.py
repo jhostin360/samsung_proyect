@@ -3,10 +3,11 @@ from tkinter import ttk
 from Conexion import *
 from tkinter import messagebox
 
+#abrir ventana principal
 ventana=Tk()
 ventana.title("Gestion de Estudiantes - PROFESORES")
 ventana.geometry("600x600")
-
+#marco que encierra el primer formulario y la tabla
 marco= LabelFrame(ventana, text="Formulario de estudiantes")
 marco.place(x=50,y=50, width=500, height=500)
 
@@ -29,7 +30,7 @@ tercero_examen =StringVar()
 examen_final =StringVar()
 promedio =StringVar()
 
-#labels
+#labels aqui se recogen los datos
 
 lbl_id =Label(marco, text="Id").grid(column=0, row=0, padx=5, pady=5)
 txt_id =Entry(marco, textvariable=id)
@@ -103,7 +104,7 @@ btnNuevo.grid(column=1, row=6, pady=5, padx=5)
 btnModificar = Button(marco, text="Modificar", command=lambda:modificar())
 btnModificar.grid(column=2, row=6, pady=5, padx=5)
 
-#funciones
+#funciones de llenar, vaciar, eliminar etc
 
 def vaciar_tabla():
     filas = tvEstudiantes.get_children()
@@ -156,6 +157,7 @@ def nuevo_calificacion():
     messagebox.showinfo(message="Se a guardado el nuevo estudiante", title="Mensaje importante")
     llenar_tabla()
 
+#funcion que contiene la segunda ventana, aqui se ingresan los datos para hacer el insert en las dos tablas
 def ventana_agregar():
     ventana_2=Tk()
     ventana_2.title("Gestion de Estudiantes - PROFESORES - Nuevo")
@@ -222,13 +224,12 @@ def ventana_agregar():
     txt_Examen_final =Entry(marco_2, textvariable=examen_final)
     txt_Examen_final.grid(column=1, row=4)
 
-    #botones marco 1
+    #botones marco 2
     btnNuevo = Button(marco_2, text="Agregar", command=lambda:nuevo_calificacion())
     btnNuevo.grid(column=0, row=5, pady=5, padx=5)
 
     ventana.mainloop()
 
-
+#aqui se invoca el metodo de llenar la tabla y se termina la ejecucion.
 llenar_tabla()
-#hello
 ventana.mainloop()
