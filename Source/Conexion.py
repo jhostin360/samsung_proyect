@@ -1,7 +1,7 @@
 import pyodbc
 
 try:
-    connection=pyodbc.connect('DRIVER={SQL Server};SERVER=JHOSTIN\SQLEXPRESS;DATABASE=proyecto_samsung;UID=sa;PWD=1234')
+    connection=pyodbc.connect('DRIVER={SQL Server};SERVER=MSI;DATABASE=proyecto_samsung;Trusted_Connection=yes')
     print("Conexion exitosa")
 except Exception as ex:
     print(ex)
