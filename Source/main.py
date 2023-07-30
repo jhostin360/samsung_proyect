@@ -26,38 +26,44 @@ def ventana_principal():
 
     #labels aqui se recogen los datos
 
+    lbl_id_alumnos =Label(marco, text="ID").grid(column=0, row=0, padx=5, pady=5)
+    txt_id_alumnos =Entry(marco, textvariable="id_alumnos")
+    txt_id_alumnos.grid(column=1, row=0)
+
     lbl_Nombre =Label(marco, text="Nombre").grid(column=0, row=1, padx=5, pady=5)
-    txt_Nombre =Entry(marco, textvariable=Datos.set_nombre)
+    txt_Nombre =Entry(marco, textvariable="nombre")
     txt_Nombre.grid(column=1, row=1)
 
-    lbl_Apellido =Label(marco, text="Apellido").grid(column=2, row=0, padx=5, pady=5)
-    txt_Apellido =Entry(marco, textvariable=Datos.set_apellido)
-    txt_Apellido.grid(column=3, row=0)
+    lbl_Apellido =Label(marco, text="Apellido").grid(column=0, row=2, padx=5, pady=5)
+    txt_Apellido =Entry(marco, textvariable="apellido")
+    txt_Apellido.grid(column=1, row=2)
 
-    lbl_Sexo =Label(marco, text="Sexo").grid(column=2, row=1, padx=5, pady=5)
-    txt_Sexo =Entry(marco, textvariable=Datos.set_sexo)
-    txt_Sexo.grid(column=3, row=1)
+    lbl_Sexo =Label(marco, text="Sexo").grid(column=0, row=3, padx=5, pady=5)
+    txt_Sexo =ttk.Combobox(marco, values=["Hombre", "Mujer"],  textvariable=Datos().set_sexo)
+    txt_Sexo.grid(column=1, row=3)
+    txt_Sexo.current(0)
 
-    lbl_Primer_examen =Label(marco, text="Primer Examen").grid(column=0, row=2, padx=5, pady=5)
-    txt_Primer_examen =Entry(marco, textvariable=Datos.set_primer_examen)
-    txt_Primer_examen.grid(column=1, row=2)
+
+    lbl_Primer_examen =Label(marco, text="Primer Examen").grid(column=2, row=1, padx=5, pady=5)
+    txt_Primer_examen =Entry(marco, textvariable="primer_examen")
+    txt_Primer_examen.grid(column=3, row=1)
 
     lbl_Segundo_examen =Label(marco, text="Segundo Examen").grid(column=2, row=2, padx=5, pady=5)
-    txt_Segundo_examen =Entry(marco, textvariable=Datos.set_segundo_examen)
+    txt_Segundo_examen =Entry(marco, textvariable="segundo_examen")
     txt_Segundo_examen.grid(column=3, row=2)
 
-    lbl_Tercer_examen =Label(marco, text="Tercer Examen").grid(column=0, row=3, padx=5, pady=5)
-    txt_Tercer_examen =Entry(marco, textvariable=Datos.set_tercer_examen)
-    txt_Tercer_examen.grid(column=1, row=3)
+    lbl_Tercer_examen =Label(marco, text="Tercer Examen").grid(column=2, row=3, padx=5, pady=5)
+    txt_Tercer_examen =Entry(marco, textvariable="tercer_examen")
+    txt_Tercer_examen.grid(column=3, row=3)
 
-    lbl_Examen_final =Label(marco, text="Examen Final").grid(column=2, row=3, padx=5, pady=5)
-    txt_Examen_final =Entry(marco, textvariable=Datos.set_examen_final)
-    txt_Examen_final.grid(column=3, row=3)
+    lbl_Examen_final =Label(marco, text="Examen Final").grid(column=2, row=4, padx=5, pady=5)
+    txt_Examen_final =Entry(marco, textvariable="examen_final")
+    txt_Examen_final.grid(column=3, row=4)
 
     #tabla de estudiantes
 
     tvEstudiantes =ttk.Treeview(marco)
-    tvEstudiantes.grid(column=0, row=5, columnspan=5, padx=5)
+    tvEstudiantes.grid(column=0, row=6, columnspan=5, padx=5)
     tvEstudiantes["columns"]=("Id", "Nombre", "Apellido", "Sexo", "Primer Examen", "Segundo Examen", "Tercer Examen", "Examen Final", "Promedio")
     tvEstudiantes.column("#0", width=0, stretch=NO)
 
@@ -86,15 +92,40 @@ def ventana_principal():
     #botones
 
     btnEliminar = Button(marco, text="Eliminar", command=lambda:eliminar())
-    btnEliminar.grid(column=0, row=6, pady=5, padx=5)
+    btnEliminar.grid(column=0, row=7, pady=5, padx=5)
 
     btnNuevo = Button(marco, text="Agregar", command=lambda:agregar())
-    btnNuevo.grid(column=1, row=6, pady=5, padx=5)
+    btnNuevo.grid(column=1, row=7, pady=5, padx=5)
 
-    btnModificar = Button(marco, text="Modificar", command=lambda:modificar())
-    btnModificar.grid(column=2, row=6, pady=5, padx=5)
+    btnModificar = Button(marco, text="Modificar alumno", command=lambda:modificar())
+    btnModificar.grid(column=2, row=7, pady=5, padx=5)
+
+    btnModificar = Button(marco, text="Seleccionar", command=lambda:seleccionar_rows())
+    btnModificar.grid(column=3, row=7, pady=5, padx=5)
 
 #funciones de llenar, vaciar, eliminar etc
+    def seleccionar_rows():
+        pass
+
+    def modificar():
+        id = txt_id_alumnos.get()
+        nombre = txt_Nombre.get()
+        apellido = txt_Apellido.get()
+
+        # Comprobar si todos los campos están llenos
+        if id and nombre and apellido:
+            cursor = connection.cursor()
+
+            try:
+                cursor.execute("Update alumnos set nombre = ?, apellido = ?, sexo = ? where id_alumnos ="+id, (nombre, apellido))
+                connection.commit()
+                messagebox.showinfo("Registro Exitoso", "El Alumno ha sido modificado correctamente.")
+            except pyodbc.Error as e:
+                messagebox.showerror("Error", "Ocurrió un error al modificar el alumno.")
+
+        else:
+            messagebox.showerror("Error", "Por favor, complete todos los campos.")
+
 
     def vaciar_tabla():
         filas = tvEstudiantes.get_children()
@@ -125,8 +156,6 @@ def ventana_principal():
     def agregar():
         ventana_agregar()
 
-    def modificar():
-        pass
 
     #funcion que contiene la segunda ventana, aqui se ingresan los datos para hacer el insert en las dos tablas
     def ventana_agregar():
@@ -188,6 +217,8 @@ def ventana_principal():
 
             else:
                 messagebox.showerror("Error", "Por favor, complete todos los campos.")
+
+
 
         #marco 2
 
