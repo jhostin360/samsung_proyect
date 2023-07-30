@@ -128,16 +128,6 @@ def ventana_principal():
     def modificar():
         pass
 
-    def nuevo_estudiante():
-        print(Datos.get_nombre, Datos.get_apellido, Datos.get_sexo, Datos.get_usuario, Datos.get_contrasena)
-
-    def nuevo_calificacion():
-        sql="insert into calificaciones (id_calificaciones, id_alumnos, Primer_examen, Segundo_examen, Tercer_examen, Examen_final, contrasena) values()"
-        cursor.execute(sql)
-        cursor.connection.commit()
-        messagebox.showinfo(message="Se a guardado el nuevo estudiante", title="Mensaje importante")
-        llenar_tabla()
-
     #funcion que contiene la segunda ventana, aqui se ingresan los datos para hacer el insert en las dos tablas
     def ventana_agregar():
         ventana_2=Tk()
@@ -175,6 +165,30 @@ def ventana_principal():
         btnNuevo = Button(marco, text="Agregar", command=lambda:nuevo_estudiante())
         btnNuevo.grid(column=0, row=6, pady=5, padx=5)
 
+        def nuevo_estudiante():
+            nombre = txt_Nombre.get()
+            apellido = txt_Apellido.get()
+            sexo = txt_Sexo.get()
+            usuario = txt_Usuario.get()
+            contrasena = txt_Contrasena.get()
+
+             # Comprobar si todos los campos están llenos
+            if nombre and apellido and usuario and contrasena:
+                cursor = connection.cursor()
+
+            # Insertar el nuevo profesor en la base de datos
+            try:
+                cursor.execute("INSERT INTO alumnos (nombre, apellido, sexo, usuario, contrasena) VALUES (?, ?, ?, ?, ?)", (nombre, apellido, sexo, usuario, contrasena))
+                connection.commit()
+                messagebox.showinfo("Registro Exitoso", "El alumno ha sido registrado correctamente.")
+                # Cerrar la ventana de registro después de registrar al profesor
+                register_window.destroy()
+            except pyodbc.Error as e:
+                messagebox.showerror("Error", "Ocurrió un error al registrar al alumno.")
+
+            else:
+                messagebox.showerror("Error", "Por favor, complete todos los campos.")
+
         #marco 2
 
         #labels
@@ -208,6 +222,31 @@ def ventana_principal():
         #botones marco 2
         btnNuevo = Button(marco_2, text="Agregar", command=lambda:nuevo_calificacion())
         btnNuevo.grid(column=0, row=5, pady=5, padx=5)
+
+        def nuevo_calificacion():
+            id_alumno = txt_fk_id_alumnos.get()
+            primer_examen = txt_Primer_examen.get()
+            segundo_examen = txt_Segundo_examen.get()
+            tercer_examen = txt_Tercer_examen.get()
+            examen_final = txt_Examen_final.get()
+
+             # Comprobar si todos los campos están llenos
+            if id_alumno and primer_examen and segundo_examen and tercer_examen and examen_final:
+                cursor = connection.cursor()
+
+            # Insertar el nuevo profesor en la base de datos
+            try:
+                cursor.execute("INSERT INTO calificaciones (id_alumnos, Primer_examen, Segundo_examen, Tercer_examen, Examen_final) VALUES (?, ?, ?, ?, ?)", (id_alumno, primer_examen, segundo_examen, tercer_examen, examen_final))
+                connection.commit()
+                messagebox.showinfo("Registro Exitoso", "Las calificaciones ha sido registradas correctamente.")
+                llenar_tabla()
+                # Cerrar la ventana de registro después de registrar al profesor
+                register_window.destroy()
+            except pyodbc.Error as e:
+                messagebox.showerror("Error", "Ocurrió un error al registrar las calificaciones.")
+
+            else:
+                messagebox.showerror("Error", "Por favor, complete todos los campos.")
 
         ventana.mainloop()
 
