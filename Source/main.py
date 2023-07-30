@@ -15,19 +15,56 @@ def ventana_principal():
     #abrir ventana principal
     ventana=Tk()
     ventana.title("Gestion de Estudiantes - PROFESORES")
-    ventana.geometry("600x600")
+    ventana.geometry("1100x650")
+    utl.centrar_ventana(ventana, 1100, 650)
     #marco que encierra el primer formulario y la tabla
     marco= LabelFrame(ventana, text="Formulario de estudiantes")
-    marco.place(x=50,y=50, width=500, height=500)
+    marco.place(x=50,y=50, width=1000, height=550)
 
     #Instancias
 
     cursor = connection.cursor()
 
+    #Funcion para seleccionar estudiantes
+    def seleccionar_estudiante(event):
+        mostrar_boton()
+        item = tvEstudiantes.selection()
+        if item:
+            # Obtener los datos del estudiante seleccionado desde la tabla
+            datos_estudiante = tvEstudiantes.item(item, "values")
+            if datos_estudiante:
+                id_alumnos, nombre, apellido, sexo, primer_examen, segundo_examen, tercer_examen, examen_final, promedio = datos_estudiante
+
+                # Actualizar los campos de entrada con los datos del estudiante seleccionado
+                txt_id_alumnos.config(state='normal')
+                txt_id_alumnos.delete(0, END)
+                txt_id_alumnos.insert(0, id_alumnos)
+                txt_id_alumnos.config(state='disabled')
+
+                txt_Nombre.delete(0, END)
+                txt_Nombre.insert(0, nombre)
+
+                txt_Apellido.delete(0, END)
+                txt_Apellido.insert(0, apellido)
+
+                txt_Sexo.delete(0, END)
+                txt_Sexo.insert(0, sexo)
+
+                txt_Primer_examen.delete(0, END)
+                txt_Primer_examen.insert(0, primer_examen)
+
+                txt_Segundo_examen.delete(0, END)
+                txt_Segundo_examen.insert(0, segundo_examen)
+
+                txt_Tercer_examen.delete(0, END)
+                txt_Tercer_examen.insert(0, tercer_examen)
+
+                txt_Examen_final.delete(0, END)
+                txt_Examen_final.insert(0, examen_final)
     #labels aqui se recogen los datos
 
     lbl_id_alumnos =Label(marco, text="ID").grid(column=0, row=0, padx=5, pady=5)
-    txt_id_alumnos =Entry(marco, textvariable="id_alumnos")
+    txt_id_alumnos =Entry(marco, textvariable="id_alumnos", state='readonly')
     txt_id_alumnos.grid(column=1, row=0)
 
     lbl_Nombre =Label(marco, text="Nombre").grid(column=0, row=1, padx=5, pady=5)
@@ -68,14 +105,14 @@ def ventana_principal():
     tvEstudiantes.column("#0", width=0, stretch=NO)
 
     tvEstudiantes.column("Id", width=30, anchor=CENTER)
-    tvEstudiantes.column("Nombre", width=55, anchor=CENTER)
-    tvEstudiantes.column("Apellido", width=55, anchor=CENTER)
-    tvEstudiantes.column("Sexo", width=50, anchor=CENTER)
-    tvEstudiantes.column("Primer Examen", width=60, anchor=CENTER)
-    tvEstudiantes.column("Segundo Examen", width=60, anchor=CENTER)
-    tvEstudiantes.column("Tercer Examen", width=60, anchor=CENTER)
-    tvEstudiantes.column("Examen Final", width=60, anchor=CENTER)
-    tvEstudiantes.column("Promedio", width=50, anchor=CENTER)
+    tvEstudiantes.column("Nombre", width=90, anchor=CENTER)
+    tvEstudiantes.column("Apellido", width=90, anchor=CENTER)
+    tvEstudiantes.column("Sexo", width=60, anchor=CENTER)
+    tvEstudiantes.column("Primer Examen", width=100, anchor=CENTER)
+    tvEstudiantes.column("Segundo Examen", width=100, anchor=CENTER)
+    tvEstudiantes.column("Tercer Examen", width=100, anchor=CENTER)
+    tvEstudiantes.column("Examen Final", width=100, anchor=CENTER)
+    tvEstudiantes.column("Promedio", width=80, anchor=CENTER)
 
     tvEstudiantes.heading("#0", text="")
 
@@ -89,73 +126,114 @@ def ventana_principal():
     tvEstudiantes.heading("Examen Final", text="Examen Final", anchor=CENTER)
     tvEstudiantes.heading("Promedio", text="Promedio", anchor=CENTER)
 
+    tvEstudiantes.bind("<<TreeviewSelect>>", seleccionar_estudiante)
+
     #botones
 
-    btnEliminar = Button(marco, text="Eliminar", command=lambda:eliminar())
+    btnEliminar = Button(marco, text="Eliminar", command=lambda:eliminar_estudiante())
     btnEliminar.grid(column=0, row=7, pady=5, padx=5)
 
     btnNuevo = Button(marco, text="Agregar", command=lambda:agregar())
     btnNuevo.grid(column=1, row=7, pady=5, padx=5)
 
-    btnModificar = Button(marco, text="Modificar alumno", command=lambda:modificar())
+    btnModificar = Button(marco, text="Modificar alumno", command=lambda:editar_estudiantes())
     btnModificar.grid(column=2, row=7, pady=5, padx=5)
 
-    btnModificar = Button(marco, text="Seleccionar", command=lambda:seleccionar_rows())
-    btnModificar.grid(column=3, row=7, pady=5, padx=5)
+    btnLimpiar = Button(marco, text="Limpiar Campos", command=lambda:vaciar_inputs())
+    btnLimpiar.grid(column=3, row=7, pady=5, padx=5)
 
-#funciones de llenar, vaciar, eliminar etc
-    def seleccionar_rows():
-        pass
-
-    def modificar():
-        id = txt_id_alumnos.get()
-        nombre = txt_Nombre.get()
-        apellido = txt_Apellido.get()
-
-        # Comprobar si todos los campos están llenos
-        if id and nombre and apellido:
-            cursor = connection.cursor()
-
-            try:
-                cursor.execute("Update alumnos set nombre = ?, apellido = ?, sexo = ? where id_alumnos ="+id, (nombre, apellido))
-                connection.commit()
-                messagebox.showinfo("Registro Exitoso", "El Alumno ha sido modificado correctamente.")
-            except pyodbc.Error as e:
-                messagebox.showerror("Error", "Ocurrió un error al modificar el alumno.")
-
-        else:
-            messagebox.showerror("Error", "Por favor, complete todos los campos.")
-
-
+    #funciones de llenar, vaciar, eliminar etc
+  
     def vaciar_tabla():
         filas = tvEstudiantes.get_children()
         for fila in filas:
             tvEstudiantes.delete(fila)
 
+    def editar_estudiantes():
+        # Obtener los datos ingresados por el usuario
+        id_alumno = txt_id_alumnos.get()
+        nombre = txt_Nombre.get()
+        apellido = txt_Apellido.get()
+        sexo = txt_Sexo.get()
+        primer_examen = txt_Primer_examen.get()
+        segundo_examen = txt_Segundo_examen.get()
+        tercer_examen = txt_Tercer_examen.get()
+        examen_final = txt_Examen_final.get()
+
+        # Actualizar los datos del estudiante en la base de datos
+        sql_actualizar = "UPDATE alumnos SET nombre=?, apellido=?, sexo=? WHERE id_alumnos=?"
+        cursor.execute(sql_actualizar, (nombre, apellido, sexo, id_alumno))
+
+        sql_actualizar_calificaciones = "UPDATE calificaciones SET Primer_examen=?, Segundo_examen=?, Tercer_examen=?, Examen_final=? WHERE id_alumnos=?"
+        cursor.execute(sql_actualizar_calificaciones, (primer_examen, segundo_examen, tercer_examen, examen_final, id_alumno))
+
+        # Confirmar los cambios en la base de datos
+        connection.commit()
+
+        messagebox.showinfo("Editar Estudiante", "Estudiante editado exitosamente.")
+
+        vaciar_inputs()
+        # Actualizar la tabla con los datos modificados
+        llenar_tabla()
+
     def llenar_tabla():
         vaciar_tabla()
-        sql = "SELECT alumnos.id_alumnos, nombre, apellido, sexo, Primer_examen, Segundo_examen, Tercer_examen, Examen_final, (Primer_examen + Segundo_examen + Tercer_examen + Examen_final) / 4 as Promedio FROM alumnos, calificaciones WHERE calificaciones.id_alumnos = alumnos.id_alumnos"
+        sql = "SELECT alumnos.id_alumnos, nombre, apellido, sexo, Primer_examen, Segundo_examen, Tercer_examen, Examen_final, (Primer_examen + Segundo_examen + Tercer_examen + Examen_final) / 4 as Promedio FROM alumnos LEFT JOIN calificaciones ON alumnos.id_alumnos = calificaciones.id_alumnos"
         cursor.execute(sql)
         filas = cursor.fetchall()
         for fila in filas:
             id_alumno = fila[0]
-            tvEstudiantes.insert("", END, id_alumno, text=id_alumno, values=fila)
+            nombre = fila[1].strip("'")
+            apellido = fila[2].strip("'")
+            sexo = fila[3].strip("'")
+            primer_examen = str(fila[4])
+            segundo_examen = str(fila[5])
+            tercer_examen = str(fila[6])
+            examen_final = str(fila[7])
+            promedio = str(fila[8])
 
+            # Insertar los datos en la tabla
+            tvEstudiantes.insert("", END, id_alumno, text=id_alumno, values=(
+                id_alumno, nombre, apellido, sexo, primer_examen, segundo_examen, tercer_examen, examen_final, promedio
+            ))
 
-    def eliminar():
-        id = tvEstudiantes.selection()[0]
-        if int(id)>0:
-            sql="delete from alumnos where id_alumnos="+id
-            cursor.execute(sql)
-            cursor.connection.commit()
-            tvEstudiantes.delete(id)
-            messagebox.showinfo(message="Eliminado con exito", title="Mensaje importante")
+    def vaciar_inputs():
+        ocultar_boton()
+        txt_id_alumnos.config(state='normal')
+        txt_id_alumnos.delete(0, END)
+        txt_id_alumnos.config(state='disabled')
+        txt_Nombre.delete(0, END)
+        txt_Apellido.delete(0, END)
+        txt_Sexo.set("")  # Vaciar el combobox
+        txt_Primer_examen.delete(0, END)
+        txt_Segundo_examen.delete(0, END)
+        txt_Tercer_examen.delete(0, END)
+        txt_Examen_final.delete(0, END)
+
+    def eliminar_estudiante():
+        # Obtener el ID del estudiante seleccionado en la tabla
+        seleccionado = tvEstudiantes.selection()
+        if seleccionado:
+            id_alumno = tvEstudiantes.item(seleccionado)['text']
+            
+            # Mostrar cuadro de diálogo de confirmación
+            confirmar = messagebox.askyesno("Confirmar Eliminación", "¿Estás seguro que deseas eliminar este estudiante?")
+            if confirmar:
+                cursor = connection.cursor()
+                try:
+                    # Eliminar al estudiante de la base de datos
+                    cursor.execute("DELETE FROM alumnos WHERE id_alumnos = ?", (id_alumno,))
+                    connection.commit()
+                    messagebox.showinfo("Estudiante Eliminado", "El estudiante ha sido eliminado correctamente.")
+                    llenar_tabla()  # Actualizar la tabla después de eliminar al estudiante
+                    vaciar_inputs() # Actualizar
+                except pyodbc.Error as e:
+                    messagebox.showerror("Error", "Ocurrió un error al eliminar al estudiante.")
         else:
-            messagebox.showinfo(message="Seleccione un registrar para eliminar", title="Mensaje importante")
+            messagebox.showwarning("Seleccionar Estudiante", "Por favor, selecciona un estudiante para eliminar.")
 
     def agregar():
         ventana_agregar()
-
 
     #funcion que contiene la segunda ventana, aqui se ingresan los datos para hacer el insert en las dos tablas
     def ventana_agregar():
@@ -211,6 +289,7 @@ def ventana_principal():
                 connection.commit()
                 messagebox.showinfo("Registro Exitoso", "El alumno ha sido registrado correctamente.")
                 # Cerrar la ventana de registro después de registrar al profesor
+                llenar_tabla()
                 register_window.destroy()
             except pyodbc.Error as e:
                 messagebox.showerror("Error", "Ocurrió un error al registrar al alumno.")
@@ -226,12 +305,19 @@ def ventana_principal():
         marco_2= LabelFrame(ventana_2, text="Calificaciones del estudiante")
         marco_2.place(x=50,y=300, width=400, height=250)
 
+        def obtener_id_alumnos():
+            cursor = connection.cursor()
+            cursor.execute("SELECT id_alumnos FROM alumnos WHERE id_alumnos NOT IN (SELECT DISTINCT id_alumnos FROM calificaciones)")
+            ids = cursor.fetchall()
+            return [id[0] for id in ids]
+
         lbl_id_calificaciones =Label(marco_2, text="Id").grid(column=0, row=0, padx=5, pady=5)
         txt_id_calificaciones =Entry(marco_2, textvariable=Datos().set_id_calificaciones)
         txt_id_calificaciones.grid(column=1, row=0)
 
-        lbl_fk_id_alumnos =Label(marco_2, text="Id_alumnos").grid(column=0, row=0, padx=5, pady=5)
-        txt_fk_id_alumnos =Entry(marco_2, textvariable=Datos().set_fk_id_alumnos)
+        lbl_fk_id_alumnos = Label(marco_2, text="Id_alumnos").grid(column=0, row=0, padx=5, pady=5)
+        ids_alumnos = obtener_id_alumnos()
+        txt_fk_id_alumnos = ttk.Combobox(marco_2, values=ids_alumnos, textvariable=Datos().set_fk_id_alumnos)
         txt_fk_id_alumnos.grid(column=1, row=0)
 
         lbl_Primer_examen =Label(marco_2, text="Primer Examen").grid(column=0, row=1, padx=5, pady=5)
@@ -281,8 +367,18 @@ def ventana_principal():
 
         ventana.mainloop()
 
+    #Funciones para mostrar y ocultar el boton de editar
+    def ocultar_boton():
+        btnModificar.grid_remove()
+        btnEliminar.grid_remove()
+
+    def mostrar_boton():
+        btnModificar.grid()
+        btnEliminar.grid()
+
     #aqui se invoca el metodo de llenar la tabla y se termina la ejecucion.
     llenar_tabla()
+    ocultar_boton()
     ventana.mainloop()
 
 
