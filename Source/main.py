@@ -4,7 +4,17 @@ from Conexion import *
 from tkinter import messagebox
 from Datos import *
 import util.generic as utl
+import time
+import locale
+from tkinter import Tk, Label, Frame
 
+nombre_profesor = ""
+
+def update_clock(label):
+    locale.setlocale(locale.LC_TIME, "es_ES")
+    now = time.strftime("%A %H:%M:%S")
+    label.configure(text=now)
+    label.after(1000, lambda: update_clock(label))
 
 def abrir_ventana_principal():
     global login  # Indicar que estamos usando la variable global
@@ -12,18 +22,36 @@ def abrir_ventana_principal():
     ventana_principal()  # Muestra la ventana principal
 
 def ventana_principal():
+    global nombre_profesor
     #abrir ventana principal
     ventana=Tk()
     ventana.title("Gestion de Estudiantes - PROFESORES")
     ventana.geometry("1100x650")
     utl.centrar_ventana(ventana, 1100, 650)
-    #marco que encierra el primer formulario y la tabla
-    marco= LabelFrame(ventana, text="Formulario de estudiantes")
-    marco.place(x=50,y=50, width=1000, height=550)
+    ventana.resizable(width=0, height=0)
+
+    # Header
+    header_frame = Frame(ventana, bg='#0d6efd', height=100)
+    header_frame.pack(fill='x')
+
+    header_content = Frame(header_frame, bg='#0d6efd')
+    header_content.pack(fill='both', expand=True)
+
+    header_label_left = Label(header_content, text=f"Bienvenido, {nombre_profesor}", font=('Arial', 16), fg='white', bg='#0d6efd')
+    header_label_left.pack(side='left', padx=10, pady=10)
+
+    current_time_label = Label(header_content, text="", font=('Arial', 16), fg='white', bg='#0d6efd')
+    current_time_label.pack(side='right', padx=10, pady=10)
+
+    # Actualizar la hora cada segundo
+    update_clock(current_time_label)
 
     #Instancias
-
     cursor = connection.cursor()
+
+    #marco que encierra el primer formulario y la tabla
+    marco= LabelFrame(ventana, text="Formulario de estudiantes")
+    marco.place(x=50,y=80, width=1000, height=500)
 
     #Funcion para seleccionar estudiantes
     def seleccionar_estudiante(event):
@@ -62,40 +90,49 @@ def ventana_principal():
                 txt_Examen_final.delete(0, END)
                 txt_Examen_final.insert(0, examen_final)
     #labels aqui se recogen los datos
-
-    lbl_id_alumnos =Label(marco, text="ID").grid(column=0, row=0, padx=5, pady=5)
-    txt_id_alumnos =Entry(marco, textvariable="id_alumnos", state='readonly')
+    estilo_inputs = {
+        "background": "#fff",  # Color de fondo
+        "foreground": "#333333",  # Color del texto
+        "font": ("Times", 12),    # Fuente y tamaño del texto
+        "width": 33,
+    }
+    estilo_labels = {
+        "foreground": "#000",
+        "font":('Times', 11)
+    }
+    lbl_id_alumnos =Label(marco, text="ID:",**estilo_labels).grid(column=0, row=0, padx=5, pady=5)
+    txt_id_alumnos =Entry(marco, textvariable="id_alumnos", state='readonly',**estilo_inputs)
     txt_id_alumnos.grid(column=1, row=0)
 
-    lbl_Nombre =Label(marco, text="Nombre").grid(column=0, row=1, padx=5, pady=5)
-    txt_Nombre =Entry(marco, textvariable="nombre")
+    lbl_Nombre =Label(marco, text="Nombre:",**estilo_labels).grid(column=0, row=1, padx=5, pady=5)
+    txt_Nombre =Entry(marco, textvariable="nombre",**estilo_inputs)
     txt_Nombre.grid(column=1, row=1)
 
-    lbl_Apellido =Label(marco, text="Apellido").grid(column=0, row=2, padx=5, pady=5)
-    txt_Apellido =Entry(marco, textvariable="apellido")
+    lbl_Apellido =Label(marco, text="Apellido:",**estilo_labels).grid(column=0, row=2, padx=5, pady=5)
+    txt_Apellido =Entry(marco, textvariable="apellido",**estilo_inputs)
     txt_Apellido.grid(column=1, row=2)
 
-    lbl_Sexo =Label(marco, text="Sexo").grid(column=0, row=3, padx=5, pady=5)
-    txt_Sexo =ttk.Combobox(marco, values=["Hombre", "Mujer"],  textvariable=Datos().set_sexo)
+    lbl_Sexo =Label(marco, text="Sexo:",**estilo_labels).grid(column=0, row=3, padx=5, pady=5)
+    txt_Sexo =ttk.Combobox(marco, values=["Hombre", "Mujer"],  textvariable=Datos().set_sexo,**estilo_inputs,w=31)
     txt_Sexo.grid(column=1, row=3)
     txt_Sexo.current(0)
 
 
-    lbl_Primer_examen =Label(marco, text="Primer Examen").grid(column=2, row=1, padx=5, pady=5)
-    txt_Primer_examen =Entry(marco, textvariable="primer_examen")
-    txt_Primer_examen.grid(column=3, row=1)
+    lbl_Primer_examen =Label(marco, text="Primer Examen:",**estilo_labels).grid(column=2, row=0, padx=5, pady=5)
+    txt_Primer_examen =Entry(marco, textvariable="primer_examen",**estilo_inputs)
+    txt_Primer_examen.grid(column=3, row=0)
 
-    lbl_Segundo_examen =Label(marco, text="Segundo Examen").grid(column=2, row=2, padx=5, pady=5)
-    txt_Segundo_examen =Entry(marco, textvariable="segundo_examen")
-    txt_Segundo_examen.grid(column=3, row=2)
+    lbl_Segundo_examen =Label(marco, text="Segundo Examen:",**estilo_labels).grid(column=2, row=1, padx=5, pady=5)
+    txt_Segundo_examen =Entry(marco, textvariable="segundo_examen",**estilo_inputs)
+    txt_Segundo_examen.grid(column=3, row=1)
 
-    lbl_Tercer_examen =Label(marco, text="Tercer Examen").grid(column=2, row=3, padx=5, pady=5)
-    txt_Tercer_examen =Entry(marco, textvariable="tercer_examen")
-    txt_Tercer_examen.grid(column=3, row=3)
+    lbl_Tercer_examen =Label(marco, text="Tercer Examen:",**estilo_labels).grid(column=2, row=2, padx=5, pady=5)
+    txt_Tercer_examen =Entry(marco, textvariable="tercer_examen",**estilo_inputs)
+    txt_Tercer_examen.grid(column=3, row=2)
 
-    lbl_Examen_final =Label(marco, text="Examen Final").grid(column=2, row=4, padx=5, pady=5)
-    txt_Examen_final =Entry(marco, textvariable="examen_final")
-    txt_Examen_final.grid(column=3, row=4)
+    lbl_Examen_final =Label(marco, text="Examen Final:",**estilo_labels).grid(column=2, row=3, padx=5, pady=5)
+    txt_Examen_final =Entry(marco, textvariable="examen_final",**estilo_inputs)
+    txt_Examen_final.grid(column=3, row=3)
 
     #tabla de estudiantes
 
@@ -104,15 +141,15 @@ def ventana_principal():
     tvEstudiantes["columns"]=("Id", "Nombre", "Apellido", "Sexo", "Primer Examen", "Segundo Examen", "Tercer Examen", "Examen Final", "Promedio")
     tvEstudiantes.column("#0", width=0, stretch=NO)
 
-    tvEstudiantes.column("Id", width=30, anchor=CENTER)
-    tvEstudiantes.column("Nombre", width=90, anchor=CENTER)
-    tvEstudiantes.column("Apellido", width=90, anchor=CENTER)
-    tvEstudiantes.column("Sexo", width=60, anchor=CENTER)
+    tvEstudiantes.column("Id", width=40, anchor=CENTER)
+    tvEstudiantes.column("Nombre", width=100, anchor=CENTER)
+    tvEstudiantes.column("Apellido", width=100, anchor=CENTER)
+    tvEstudiantes.column("Sexo", width=80, anchor=CENTER)
     tvEstudiantes.column("Primer Examen", width=100, anchor=CENTER)
     tvEstudiantes.column("Segundo Examen", width=100, anchor=CENTER)
     tvEstudiantes.column("Tercer Examen", width=100, anchor=CENTER)
     tvEstudiantes.column("Examen Final", width=100, anchor=CENTER)
-    tvEstudiantes.column("Promedio", width=80, anchor=CENTER)
+    tvEstudiantes.column("Promedio", width=90, anchor=CENTER)
 
     tvEstudiantes.heading("#0", text="")
 
@@ -129,17 +166,16 @@ def ventana_principal():
     tvEstudiantes.bind("<<TreeviewSelect>>", seleccionar_estudiante)
 
     #botones
-
-    btnEliminar = Button(marco, text="Eliminar", command=lambda:eliminar_estudiante())
+    btnEliminar = Button(marco, text="Eliminar", bg='#dc3545', font=('Times', 13), fg="#fff", command=lambda:eliminar_estudiante())
     btnEliminar.grid(column=0, row=7, pady=5, padx=5)
 
-    btnNuevo = Button(marco, text="Agregar", command=lambda:agregar())
+    btnNuevo = Button(marco, text="Agregar", bg='#0d6efd', font=('Times', 13), fg="#fff", command=lambda:agregar())
     btnNuevo.grid(column=1, row=7, pady=5, padx=5)
 
-    btnModificar = Button(marco, text="Modificar alumno", command=lambda:editar_estudiantes())
+    btnModificar = Button(marco, text="Modificar alumno", font=('Times', 13), bg='#198754', fg="#fff", command=lambda:editar_estudiantes())
     btnModificar.grid(column=2, row=7, pady=5, padx=5)
 
-    btnLimpiar = Button(marco, text="Limpiar Campos", command=lambda:vaciar_inputs())
+    btnLimpiar = Button(marco, text="Limpiar Campos", font=('Times', 13), bg='#ffc107', fg="#fff", command=lambda:vaciar_inputs())
     btnLimpiar.grid(column=3, row=7, pady=5, padx=5)
 
     #funciones de llenar, vaciar, eliminar etc
@@ -465,6 +501,7 @@ def ventana_login():
     global login
     
     def validar_login():
+        global nombre_profesor
         # Obtener los datos ingresados por el usuario
         usuario = entry_usuario.get()
         contrasena = entry_contrasena.get()
@@ -472,14 +509,14 @@ def ventana_login():
         cursor = connection.cursor()
 
         # Realizar la consulta SQL para buscar el usuario ingresado
-        cursor.execute("SELECT usuario, contrasena FROM profesores WHERE usuario = ?", (usuario,))
+        cursor.execute("SELECT usuario, contrasena, nombre, apellido FROM profesores WHERE usuario = ?", (usuario,))
         resultado = cursor.fetchone()
 
         # Comprobar si se encontró el usuario
         if resultado:
-            usuario_bd, contrasena_bd = resultado
-            # Comparar la contraseña ingresada con la contraseña almacenada
+            usuario_bd, contrasena_bd, nombre, apellido = resultado
             if contrasena == contrasena_bd:
+                nombre_profesor = nombre + " " + apellido  # Almacena el nombre del profesor en la variable global
                 abrir_ventana_principal()
             else:
                 messagebox.showerror("Error", "Contraseña incorrecta")
@@ -494,15 +531,15 @@ def ventana_login():
     login.resizable(width=0, height=0)
     utl.centrar_ventana(login, 800, 500)
 
-    ruta_imagen = "source/img/login.png"
-    tamaño_imagen = (200, 200)
+    ruta_imagen = "source/img/login1.png"
+    tamaño_imagen = (350, 220)
     # Cargar y redimensionar la imagen
     imagen = utl.leer_imagen(ruta_imagen, tamaño_imagen)
 
     frame_logo = Frame(login, bd=0, width=300,
-                              relief=SOLID, padx=10, pady=10, bg='#3a7ff6')
+                              relief=SOLID, padx=10, pady=10, bg='#0d6efd')
     frame_logo.pack(side="left", expand=YES, fill=BOTH)
-    label = Label(frame_logo, image=imagen, bg='#3a7ff6')
+    label = Label(frame_logo, image=imagen, bg='#0d6efd')
     label.place(x=0, y=0, relwidth=1, relheight=1)
 
 
@@ -531,11 +568,11 @@ def ventana_login():
     entry_contrasena = Entry(frame_form_fill, font=('Times', 14), show="*")
     entry_contrasena.pack(fill=X, padx=20, pady=3)
 
-    btn_login = Button(frame_form_fill, text="Iniciar Sesión", font=('Times', 15), bg='#3a7ff6', bd=0, fg="#fff", command=validar_login)
+    btn_login = Button(frame_form_fill, text="Iniciar Sesión", font=('Times', 15), bg='#0d6efd', bd=0, fg="#fff", command=validar_login)
     btn_login.pack(fill=X, padx=20, pady=20)
 
     btn_register = Button(frame_form_fill, text="Registrar usuario", font=(
-            'Times', 15), bg='#fcfcfc', bd=0, fg="#3a7ff6", command=ventana_register)
+            'Times', 15), bg='#fcfcfc', bd=0, fg="#0d6efd", command=ventana_register)
     btn_register.pack(fill=X, padx=20, pady=20)
 
     # Loop principal para la ventana de inicio de sesión
