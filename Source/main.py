@@ -9,6 +9,7 @@ import locale
 from tkinter import Tk, Label, Frame
 
 nombre_profesor = ""
+img = None
 
 def update_clock(label):
     locale.setlocale(locale.LC_TIME, "es_ES")
@@ -31,16 +32,16 @@ def ventana_principal():
     ventana.resizable(width=0, height=0)
 
     # Header
-    header_frame = Frame(ventana, bg='#0d6efd', height=100)
+    header_frame = Frame(ventana, bg='#57a1f8', height=100)
     header_frame.pack(fill='x')
 
-    header_content = Frame(header_frame, bg='#0d6efd')
+    header_content = Frame(header_frame, bg='#57a1f8')
     header_content.pack(fill='both', expand=True)
 
-    header_label_left = Label(header_content, text=f"Bienvenido, {nombre_profesor}", font=('Arial', 16), fg='white', bg='#0d6efd')
+    header_label_left = Label(header_content, text=f"Bienvenido, {nombre_profesor}", font=('Arial', 16), fg='white', bg='#57a1f8')
     header_label_left.pack(side='left', padx=10, pady=10)
 
-    current_time_label = Label(header_content, text="", font=('Arial', 16), fg='white', bg='#0d6efd')
+    current_time_label = Label(header_content, text="", font=('Arial', 16), fg='white', bg='#57a1f8')
     current_time_label.pack(side='right', padx=10, pady=10)
 
     # Actualizar la hora cada segundo
@@ -166,16 +167,20 @@ def ventana_principal():
     tvEstudiantes.bind("<<TreeviewSelect>>", seleccionar_estudiante)
 
     #botones
-    btnEliminar = Button(marco, text="Eliminar", bg='#dc3545', font=('Times', 13), fg="#fff", command=lambda:eliminar_estudiante())
+    #btnEliminar = Button(marco, text="Eliminar", bg='#dc3545', font=('Times', 13), fg="#fff", command=lambda:eliminar_estudiante())
+    btnEliminar = Button(marco, width=17, pady=7, text='Eliminar', bg='#dc3545', fg='white', border=0, command=lambda:eliminar_estudiante())
     btnEliminar.grid(column=0, row=7, pady=5, padx=5)
 
-    btnNuevo = Button(marco, text="Agregar", bg='#0d6efd', font=('Times', 13), fg="#fff", command=lambda:agregar())
+    #btnNuevo = Button(marco, text="Agregar", bg='#0d6efd', font=('Times', 13), fg="#fff", command=lambda:agregar())
+    btnNuevo = Button(marco, width=17, pady=7, text='Agregar', bg='#57a1f8', fg='white', border=0, command=lambda:agregar())
     btnNuevo.grid(column=1, row=7, pady=5, padx=5)
 
-    btnModificar = Button(marco, text="Modificar alumno", font=('Times', 13), bg='#198754', fg="#fff", command=lambda:editar_estudiantes())
+    #btnModificar = Button(marco, text="Modificar alumno", font=('Times', 13), bg='#198754', fg="#fff", command=lambda:editar_estudiantes())
+    btnModificar = Button(marco, width=17, pady=7, text='Modificar alumno', bg='#198754', fg='white', border=0, command=lambda:editar_estudiantes())
     btnModificar.grid(column=2, row=7, pady=5, padx=5)
 
-    btnLimpiar = Button(marco, text="Limpiar Campos", font=('Times', 13), bg='#ffc107', fg="#fff", command=lambda:vaciar_inputs())
+    #btnLimpiar = Button(marco, text="Limpiar Campos", font=('Times', 13), bg='#ffc107', fg="#fff", command=lambda:vaciar_inputs())
+    btnLimpiar = Button(marco, width=17, pady=7, text='Limpiar Campos', bg='#ffc107', fg='white', border=0, command=lambda:vaciar_inputs())
     btnLimpiar.grid(column=3, row=7, pady=5, padx=5)
 
     #funciones de llenar, vaciar, eliminar etc
@@ -421,6 +426,10 @@ def ventana_principal():
 def ventana_register():
 
     global register_window
+    global login
+    global img
+
+    #login.destroy()
 
     def registrar_profesor():
         # Obtener los datos ingresados por el usuario
@@ -447,55 +456,98 @@ def ventana_register():
             messagebox.showerror("Error", "Por favor, complete todos los campos.")
 
 
-    register_window = Tk()
+    register_window = Toplevel(login)
     register_window.title("Registro de Nuevo Profesor")
-    register_window.geometry("444x422")
-    register_window.config(bg='#fcfcfc')
-    register_window.resizable(width=0, height=0)
-    utl.centrar_ventana(register_window, 444, 422)
-   
+    register_window.geometry('925x500+300+200')
+    register_window.configure(bg="#fff" )
+    register_window.resizable (False, False)
+    #utl.centrar_ventana(register_window, 925, 500)
 
-    frame_form = Frame(register_window, bd=0,
-                              relief=SOLID, bg='#fcfcfc')
-    
-    frame_form.pack(side="right", expand=YES, fill=BOTH)
-    frame_form_top = Frame(
-            frame_form, height=50, bd=0, relief=SOLID, bg='black')
-    frame_form_top.pack(side="top", fill=X)
+    img = PhotoImage(file='source/img/Add.png')
+    Label(register_window, image=img, border=0 ,bg='white').place(x=40,y=45)
 
-    title = Label(frame_form_top, text="Registrar Nuevo Profesor", font=(
-        'Times', 24), fg="#666a88", bg='#fcfcfc', pady=20)
-    title.pack(expand=YES, fill=BOTH)
+    frame2=Frame(register_window, width=350, height=450,bg='white')
+    frame2.place(x=480,y=30)
 
-    frame_form_fill = Frame(
-            frame_form, height=50,  bd=0, relief=SOLID, bg='#fcfcfc')
-    frame_form_fill.pack(side="bottom", expand=YES, fill=BOTH)
+    heading2=Label(frame2, text='Registrar Profesor', fg='#57a1f8',bg='white', font=('Microsoft YaHei UI Light',23,'bold'))
+    heading2.place(x=46,y=1)
+
 
     # Campos para ingresar los datos del nuevo profesor
-    lbl_nombre = Label(frame_form_fill, text="Nombre:", font=('Times', 14), fg="#666a88", bg='#fcfcfc', anchor="w")
-    lbl_nombre.pack(fill=X, padx=20, pady=1)
-    entry_nombre = Entry(frame_form_fill, font=('Times', 14), textvariable="nombre")
-    entry_nombre.pack(fill=X, padx=20, pady=3)
 
-    lbl_apellido = Label(frame_form_fill, text="Apellido:", font=('Times', 14), fg="#666a88", bg='#fcfcfc', anchor="w")
-    lbl_apellido.pack(fill=X, padx=20, pady=1)
-    entry_apellido = Entry(frame_form_fill, font=('Times', 14), textvariable="apellido")
-    entry_apellido.pack(fill=X, padx=20, pady=3)
+    #nombre
+    def on_enter(e):
+        entry_nombre = e.widget
+        if  entry_nombre.get() == 'Nombre':
+             entry_nombre.delete(0, 'end')
 
-    lbl_usuario = Label(frame_form_fill, text="Usuario:", font=('Times', 14), fg="#666a88", bg='#fcfcfc', anchor="w")
-    lbl_usuario.pack(fill=X, padx=20, pady=1)
-    entry_usuario = Entry(frame_form_fill, font=('Times', 14), textvariable="usuario")
-    entry_usuario.pack(fill=X, padx=20, pady=3)
+    def on_leave(e):
+        entry_nombre = e.widget
+        if  entry_nombre.get() == '':
+             entry_nombre.insert(0, 'Nombre')
+    entry_nombre = Entry(frame2, width=25, fg='black',bg='white', border=0, font=('Microsoft YaHei UI Light',11))
+    entry_nombre.place(x=25,y=80)
+    entry_nombre.insert(0, 'Nombre')
+    entry_nombre.bind('<FocusIn>', on_enter)
+    entry_nombre.bind('<FocusOut>', on_leave)
+    Frame(frame2, width=350, height=2, bg='black').place(x=25,y=107)
 
-    lbl_contrasena = Label(frame_form_fill, text="Contraseña:", font=('Times', 14), fg="#666a88", bg='#fcfcfc', anchor="w")
-    lbl_contrasena.pack(fill=X, padx=20, pady=1)
-    entry_contrasena = Entry(frame_form_fill, font=('Times', 14), textvariable="contraseña", show="*")
-    entry_contrasena.pack(fill=X, padx=20, pady=1)
+    #apellido
+    def on_enter(e):
+        entry_apellido = e.widget
+        if  entry_apellido.get() == 'Apellido':
+             entry_apellido.delete(0, 'end')
 
-    # Botón para guardar el nuevo profesor
-    btn_guardar = Button(frame_form_fill, text="Guardar", font=('Times', 15), bg='#3a7ff6', bd=0, fg="#fff", command=registrar_profesor)
-    btn_guardar.pack(fill=X, padx=20, pady=20)
-    
+    def on_leave(e):
+        entry_apellido = e.widget
+        if  entry_apellido.get() == '':
+             entry_apellido.insert(0, 'Apellido')
+    entry_apellido = Entry(frame2, width=25, fg='black',bg='white', border=0, font=('Microsoft YaHei UI Light',11))
+    entry_apellido.place(x=25,y=150)
+    entry_apellido.insert(0, 'Apellido')
+    entry_apellido.bind('<FocusIn>', on_enter)
+    entry_apellido.bind('<FocusOut>', on_leave)
+    Frame(frame2, width=350, height=2, bg='black').place(x=25,y=177)
+
+    #usuario
+    def on_enter(e):
+        entry_usuario = e.widget
+        if entry_usuario.get() == 'Usuario':
+            entry_usuario.delete(0, 'end')
+
+    def on_leave(e):
+        entry_usuario = e.widget
+        if entry_usuario.get() == '':
+            entry_usuario.insert(0, 'Usuario')
+    entry_usuario = Entry(frame2, width=25, fg='black',bg='white', border=0, font=('Microsoft YaHei UI Light',11))
+    entry_usuario.place(x=25,y=230)
+    entry_usuario.insert(0, 'Usuario')
+    entry_usuario.bind('<FocusIn>', on_enter)
+    entry_usuario.bind('<FocusOut>', on_leave)
+    Frame(frame2, width=350, height=2, bg='black').place(x=25,y=257)
+
+    #Contrasena
+    def on_enter(e):
+        entry_contrasena = e.widget
+        if entry_contrasena.get() == 'Contrasena':
+            entry_contrasena.delete(0, 'end')
+            entry_contrasena.config(show="*")
+
+    def on_leave(e):
+        entry_contrasena = e.widget
+        if entry_contrasena.get() == '':
+            entry_contrasena.insert(0, 'Contrasena')
+            entry_contrasena.config(show="")
+
+    entry_contrasena = Entry(frame2, width=25, fg='black',bg='white', border=0, font=('Microsoft YaHei UI Light',11))
+    entry_contrasena.place(x=25,y=310)
+    entry_contrasena.insert(0, 'Contrasena')
+    entry_contrasena.bind('<FocusIn>', on_enter)
+    entry_contrasena.bind('<FocusOut>', on_leave)
+    Frame(frame2, width=350, height=2, bg='black').place(x=25,y=337)
+
+    Button(frame2, width=39, pady=7, text='Guardar', bg='#57a1f8', fg='white', border=0, command=registrar_profesor).place(x=45,y=370)
+
 
 def ventana_login():
     global login
@@ -503,8 +555,8 @@ def ventana_login():
     def validar_login():
         global nombre_profesor
         # Obtener los datos ingresados por el usuario
-        usuario = entry_usuario.get()
-        contrasena = entry_contrasena.get()
+        usuario = user.get()
+        contrasena = code.get()
 
         cursor = connection.cursor()
 
@@ -523,60 +575,69 @@ def ventana_login():
         else:
             messagebox.showerror("Error", "Usuario no encontrado")
 
-    # Ventana de inicio de sesión (login)
-    login = Tk()
-    login.title("Inicio de Sesión")
-    login.geometry("800x500")
-    login.config(bg='#00d0ff')
-    login.resizable(width=0, height=0)
-    utl.centrar_ventana(login, 800, 500)
+    login=Tk()
+    login.title( ' Login ' )
+    login.geometry('925x500+300+200')
+    login.configure(bg="#fff" )
+    login.resizable (False, False)
+    utl.centrar_ventana(login, 925, 500)
 
-    ruta_imagen = "source/img/login1.png"
-    tamaño_imagen = (350, 220)
-    # Cargar y redimensionar la imagen
-    imagen = utl.leer_imagen(ruta_imagen, tamaño_imagen)
+    img = PhotoImage(file='source/img/login.png')
+    Label(login, image=img, bg='white').place(x=50,y=35)
 
-    frame_logo = Frame(login, bd=0, width=300,
-                              relief=SOLID, padx=10, pady=10, bg='#0d6efd')
-    frame_logo.pack(side="left", expand=YES, fill=BOTH)
-    label = Label(frame_logo, image=imagen, bg='#0d6efd')
-    label.place(x=0, y=0, relwidth=1, relheight=1)
+    frame=Frame(login, width=350, height=350,bg='white')
+    frame.place(x=480,y=70)
+
+    heading=Label(frame, text='Iniciar Sesion', fg='#57a1f8',bg='white', font=('Microsoft YaHei UI Light',23,'bold'))
+    heading.place(x=80,y=5)
+
+    def on_enter(e):
+        user.delete(0, 'end')
+
+    def on_leave(e):
+        name = user.get()
+        if name == '':
+            user.insert(0, 'Usuario')
+
+    #User
+    user = Entry(frame, width=25, fg='black',bg='white', border=0, font=('Microsoft YaHei UI Light',11))
+    user.place(x=25,y=80)
+    user.insert(0, 'Usuario')
+    user.bind('<FocusIn>', on_enter)
+    user.bind('<FocusOut>', on_leave)
+
+    Frame(frame, width=350, height=2, bg='black').place(x=25,y=107)
+
+    #Password
+    def on_enter(e):
+        code = e.widget
+        if code.get() == 'Contrasena':
+            code.delete(0, 'end')
+            code.config(show="*")
+
+    def on_leave(e):
+        code = e.widget
+        if code.get() == '':
+            code.insert(0, 'Contrasena')
+            code.config(show="")
 
 
-    frame_form = Frame(login, bd=0,
-                              relief=SOLID, bg='#fcfcfc')
-    frame_form.pack(side="right", expand=YES, fill=BOTH)
+    code = Entry(frame, width=25, fg='black',bg='white', border=0, font=('Microsoft YaHei UI Light',11))
+    code.place(x=25,y=150)
+    code.insert(0, 'Contrasena')
+    code.bind('<FocusIn>', on_enter)
+    code.bind('<FocusOut>', on_leave)
 
-    frame_form_top = Frame(
-            frame_form, height=50, bd=0, relief=SOLID, bg='black')
-    frame_form_top.pack(side="top", fill=X)
-    title = Label(frame_form_top, text="Inicio de sesion", font=(
-        'Times', 30), fg="#666a88", bg='#fcfcfc', pady=70)
-    title.pack(expand=YES, fill=BOTH)
+    Frame(frame, width=350, height=2, bg='black').place(x=25,y=177)
 
-    frame_form_fill = Frame(
-            frame_form, height=50,  bd=0, relief=SOLID, bg='#fcfcfc')
-    frame_form_fill.pack(side="bottom", expand=YES, fill=BOTH)
+    #Button
+    Button(frame, width=39, pady=7, text='Iniciar Sesion', bg='#57a1f8', fg='white', border=0, command=validar_login).place(x=44,y=204)
+    label=Label(frame, text='No tienes una cuenta?', fg='black', bg='white', font=('Microsoft YaHei UI Light', 9))
+    label.place(x=75,y=270)
 
-    lbl_usuario = Label(frame_form_fill, text="Usuario:", font=('Times', 14), fg="#666a88", bg='#fcfcfc', anchor="w")
-    lbl_usuario.pack(fill=X, padx=20, pady=1)
-    entry_usuario = Entry(frame_form_fill, font=('Times', 14), textvariable="hola")
-    entry_usuario.pack(fill=X, padx=20, pady=3)
+    sign = Button(frame, width=7,text='Registrate', border=0, bg='white', cursor='hand2', fg='#57a1f8', command=ventana_register)
+    sign.place(x=210,y=270)
 
-    lbl_contrasena = Label(frame_form_fill, text="Contrasena:", font=('Times', 14), fg="#666a88", bg='#fcfcfc', anchor="w")
-    lbl_contrasena.pack(fill=X, padx=20, pady=1)
-    entry_contrasena = Entry(frame_form_fill, font=('Times', 14), show="*")
-    entry_contrasena.pack(fill=X, padx=20, pady=3)
-
-    btn_login = Button(frame_form_fill, text="Iniciar Sesión", font=('Times', 15), bg='#0d6efd', bd=0, fg="#fff", command=validar_login)
-    btn_login.pack(fill=X, padx=20, pady=20)
-
-    btn_register = Button(frame_form_fill, text="Registrar usuario", font=(
-            'Times', 15), bg='#fcfcfc', bd=0, fg="#0d6efd", command=ventana_register)
-    btn_register.pack(fill=X, padx=20, pady=20)
-
-    # Loop principal para la ventana de inicio de sesión
     login.mainloop()
-
 # Llamada a la función para mostrar la ventana de inicio de sesión al inicio
 ventana_login()
