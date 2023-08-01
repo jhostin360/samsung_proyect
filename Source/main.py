@@ -7,6 +7,9 @@ import util.generic as utl
 import time
 import locale
 from tkinter import Tk, Label, Frame
+import pandas as pd
+import openpyxl
+
 
 nombre_profesor = ""
 img = None
@@ -52,7 +55,7 @@ def ventana_principal():
 
     #marco que encierra el primer formulario y la tabla
     marco= LabelFrame(ventana, text="Formulario de estudiantes")
-    marco.place(x=50,y=80, width=1000, height=500)
+    marco.place(x=25,y=80, width=1050, height=500)
 
     #Funcion para seleccionar estudiantes
     def seleccionar_estudiante(event):
@@ -90,6 +93,13 @@ def ventana_principal():
 
                 txt_Examen_final.delete(0, END)
                 txt_Examen_final.insert(0, examen_final)
+
+    def exportar_a_excel(workbook):
+        # Guardar el archivo Excel
+        workbook.save("datos_estudiantes.xlsx")
+    def boton_exportar_click():
+        workbook = llenar_tabla()  # Llenar la tabla y obtener el objeto workbook
+        exportar_a_excel(workbook)
     #labels aqui se recogen los datos
     estilo_inputs = {
         "background": "#fff",  # Color de fondo
@@ -117,7 +127,6 @@ def ventana_principal():
     txt_Sexo =ttk.Combobox(marco, values=["Hombre", "Mujer"],  textvariable=Datos().set_sexo,**estilo_inputs,w=31)
     txt_Sexo.grid(column=1, row=3)
     txt_Sexo.current(0)
-
 
     lbl_Primer_examen =Label(marco, text="Primer Examen:",**estilo_labels).grid(column=2, row=0, padx=5, pady=5)
     txt_Primer_examen =Entry(marco, textvariable="primer_examen",**estilo_inputs)
@@ -166,22 +175,28 @@ def ventana_principal():
 
     tvEstudiantes.bind("<<TreeviewSelect>>", seleccionar_estudiante)
 
+    #controls
+    controls= LabelFrame(ventana, text="Controles")
+    controls.place(x=870,y=95, width=182, height=300)
+
     #botones
-    #btnEliminar = Button(marco, text="Eliminar", bg='#dc3545', font=('Times', 13), fg="#fff", command=lambda:eliminar_estudiante())
-    btnEliminar = Button(marco, width=17, pady=7, text='Eliminar', bg='#dc3545', fg='white', border=0, command=lambda:eliminar_estudiante())
-    btnEliminar.grid(column=0, row=7, pady=5, padx=5)
+    btnEliminar = Button(controls, width=23, pady=7, text='Eliminar', bg='#dc3545', fg='white', border=0, command=lambda:eliminar_estudiante())
+    btnEliminar.grid(column=6, row=3, pady=5, padx=5)
 
-    #btnNuevo = Button(marco, text="Agregar", bg='#0d6efd', font=('Times', 13), fg="#fff", command=lambda:agregar())
-    btnNuevo = Button(marco, width=17, pady=7, text='Agregar', bg='#57a1f8', fg='white', border=0, command=lambda:agregar())
-    btnNuevo.grid(column=1, row=7, pady=5, padx=5)
+    btnNuevo = Button(controls, width=23, pady=7, text='Agregar Estudiantes', bg='#57a1f8', fg='white', border=0, command=lambda:agregar_estudiante())
+    btnNuevo.grid(column=6, row=0, pady=5, padx=5)
 
-    #btnModificar = Button(marco, text="Modificar alumno", font=('Times', 13), bg='#198754', fg="#fff", command=lambda:editar_estudiantes())
-    btnModificar = Button(marco, width=17, pady=7, text='Modificar alumno', bg='#198754', fg='white', border=0, command=lambda:editar_estudiantes())
-    btnModificar.grid(column=2, row=7, pady=5, padx=5)
+    btnNuevoC = Button(controls, width=23, pady=7, text='Agregar Calificaciones', bg='#57a1f8', fg='white', border=0, command=lambda:agregar_calificaciones())
+    btnNuevoC.grid(column=6, row=1, pady=5, padx=5)
 
-    #btnLimpiar = Button(marco, text="Limpiar Campos", font=('Times', 13), bg='#ffc107', fg="#fff", command=lambda:vaciar_inputs())
-    btnLimpiar = Button(marco, width=17, pady=7, text='Limpiar Campos', bg='#ffc107', fg='white', border=0, command=lambda:vaciar_inputs())
-    btnLimpiar.grid(column=3, row=7, pady=5, padx=5)
+    btnModificar = Button(controls, width=23, pady=7, text='Modificar alumno', bg='#198754', fg='white', border=0, command=lambda:editar_estudiantes())
+    btnModificar.grid(column=6, row=2, pady=5, padx=5)
+
+    btnLimpiar = Button(controls, width=23, pady=7, text='Limpiar Campos', bg='#ffc107', fg='white', border=0, command=lambda:vaciar_inputs())
+    btnLimpiar.grid(column=6, row=4, pady=5, padx=5)
+
+    btnExportar = Button(controls, width=23, pady=7, text="Exportar a Excel", bg='#2D6051', fg='white', border=0, command=lambda:boton_exportar_click())
+    btnExportar.grid(column=6, row=5, pady=5, padx=5)
 
     #funciones de llenar, vaciar, eliminar etc
   
@@ -222,6 +237,15 @@ def ventana_principal():
         sql = "SELECT alumnos.id_alumnos, nombre, apellido, sexo, Primer_examen, Segundo_examen, Tercer_examen, Examen_final, (Primer_examen + Segundo_examen + Tercer_examen + Examen_final) / 4 as Promedio FROM alumnos LEFT JOIN calificaciones ON alumnos.id_alumnos = calificaciones.id_alumnos"
         cursor.execute(sql)
         filas = cursor.fetchall()
+
+        # Crear un archivo Excel y una hoja
+        workbook = openpyxl.Workbook()
+        worksheet = workbook.active
+
+        # Insertar encabezados
+        encabezados = ["ID Alumno", "Nombre", "Apellido", "Sexo", "Primer Examen", "Segundo Examen", "Tercer Examen", "Examen Final", "Promedio"]
+        worksheet.append(encabezados)
+
         for fila in filas:
             id_alumno = fila[0]
             nombre = fila[1].strip("'")
@@ -237,6 +261,10 @@ def ventana_principal():
             tvEstudiantes.insert("", END, id_alumno, text=id_alumno, values=(
                 id_alumno, nombre, apellido, sexo, primer_examen, segundo_examen, tercer_examen, examen_final, promedio
             ))
+            datos_fila = [id_alumno, nombre, apellido, sexo, primer_examen, segundo_examen, tercer_examen, examen_final, promedio]
+            worksheet.append(datos_fila)
+
+        return workbook
 
     def vaciar_inputs():
         ocultar_boton()
@@ -272,46 +300,100 @@ def ventana_principal():
                     messagebox.showerror("Error", "Ocurrió un error al eliminar al estudiante.")
         else:
             messagebox.showwarning("Seleccionar Estudiante", "Por favor, selecciona un estudiante para eliminar.")
-
-    def agregar():
-        ventana_agregar()
-
+    
     #funcion que contiene la segunda ventana, aqui se ingresan los datos para hacer el insert en las dos tablas
-    def ventana_agregar():
-        ventana_2=Tk()
-        ventana_2.title("Gestion de Estudiantes - PROFESORES - Nuevo")
-        ventana_2.geometry("500x600")
 
-        #marco 1
+    def agregar_estudiante():
+        global login
+        global img
 
-        #labels
-        marco= LabelFrame(ventana_2, text="Datos del estudiante")
-        marco.place(x=50, y=50, width=400, height=250)
+        new_student=Toplevel(login)
+        new_student.title( ' Agregar Estudiantes ' )
+        new_student.geometry('925x550+300+200')
+        new_student.configure(bg="#fff" )
+        new_student.resizable (False, False)
+        utl.centrar_ventana( new_student, 925, 550)
 
-        lbl_Nombre =Label(marco, text="Nombre").grid(column=0, row=1, padx=5, pady=5)
-        txt_Nombre =Entry(marco, textvariable=Datos().set_nombre)
-        txt_Nombre.grid(column=1, row=1)
+        img = PhotoImage(file='source/img/add-estudiantes.png')
+        Label(new_student, image=img, bg='white').place(x=50,y=65)
 
-        lbl_Apellido =Label(marco, text="Apellido").grid(column=0, row=2, padx=5, pady=5)
-        txt_Apellido =Entry(marco, textvariable=Datos().set_apellido)
-        txt_Apellido.grid(column=1, row=2)
+        frame=Frame(new_student, width=350, height=550,bg='white')
+        frame.place(x=480,y=20)
 
-        lbl_Sexo =Label(marco, text="Sexo").grid(column=0, row=3, padx=5, pady=5)
-        txt_Sexo =ttk.Combobox(marco, values=["Hombre", "Mujer"],  textvariable=Datos().set_sexo)
-        txt_Sexo.grid(column=1, row=3)
-        txt_Sexo.current(0)
+        heading=Label(frame, text='Agregar Estudiante', fg='#57a1f8',bg='white', font=('Microsoft YaHei UI Light',23,'bold'))
+        heading.place(x=40,y=1)
+        #Nombre
+        def on_enter(e):
+            txt_Nombre.delete(0, 'end')
 
-        lbl_Usuario =Label(marco, text="Usuario").grid(column=0, row=4, padx=5, pady=5)
-        txt_Usuario =Entry(marco, textvariable=Datos().set_usuario)
-        txt_Usuario.grid(column=1, row=4)
+        def on_leave(e):
+            name = txt_Nombre.get()
+            if name == '':
+                txt_Nombre.insert(0, 'Nombre')
 
-        lbl_Contrasena =Label(marco, text="Contraseña").grid(column=0, row=5, padx=5, pady=5)
-        txt_Contrasena =Entry(marco, textvariable=Datos().set_contrasena)
-        txt_Contrasena.grid(column=1, row=5)
+        txt_Nombre =Entry(frame, textvariable=Datos().set_nombre, width=25, fg='black',bg='white', border=0, font=('Microsoft YaHei UI Light',11))
+        txt_Nombre.place(x=25,y=80)
+        txt_Nombre.insert(0, 'Nombre')
+        txt_Nombre.bind('<FocusIn>', on_enter)
+        txt_Nombre.bind('<FocusOut>', on_leave)
+        Frame(frame, width=350, height=2, bg='black').place(x=25,y=107)
+        #Apellido
+        def on_enter(e):
+            txt_Apellido.delete(0, 'end')
 
-        #botones marco 1
-        btnNuevo = Button(marco, text="Agregar", command=lambda:nuevo_estudiante())
-        btnNuevo.grid(column=0, row=6, pady=5, padx=5)
+        def on_leave(e):
+            name = txt_Apellido.get()
+            if name == '':
+                txt_Apellido.insert(0, 'Apellido')
+
+        txt_Apellido =Entry(frame, textvariable=Datos().set_apellido, width=25, fg='black',bg='white', border=0, font=('Microsoft YaHei UI Light',11))
+        txt_Apellido.place(x=25,y=150)
+        txt_Apellido.insert(0, 'Apellido')
+        txt_Apellido.bind('<FocusIn>', on_enter)
+        txt_Apellido.bind('<FocusOut>', on_leave)
+        Frame(frame, width=350, height=2, bg='black').place(x=25,y=177)
+
+        #Sexo
+        txt_Sexo = ttk.Combobox(frame, values=["Hombre", "Mujer"], textvariable=Datos().set_sexo, width=37, font=('Microsoft YaHei UI Light',11))
+        txt_Sexo.place(x=25,y=220)
+        txt_Sexo.insert(0, 'Seleccione el sexo')
+        
+        #Usuario
+        def on_enter(e):
+            txt_Usuario.delete(0, 'end')
+
+        def on_leave(e):
+            name = txt_Usuario.get()
+            if name == '':
+                txt_Usuario.insert(0, 'Usuario')
+
+        txt_Usuario =Entry(frame, textvariable=Datos().set_usuario, width=25, fg='black',bg='white', border=0, font=('Microsoft YaHei UI Light',11))
+        txt_Usuario.place(x=25,y=290)
+        txt_Usuario.insert(0, 'Usuario')
+        txt_Usuario.bind('<FocusIn>', on_enter)
+        txt_Usuario.bind('<FocusOut>', on_leave)
+        Frame(frame, width=350, height=2, bg='black').place(x=25,y=317)
+        #Crontrasena
+        def on_enter(e):
+            txt_Contrasena = e.widget
+            if txt_Contrasena.get() == 'Contrasena':
+                txt_Contrasena.delete(0, 'end')
+                txt_Contrasena.config(show="*")
+
+        def on_leave(e):
+            txt_Contrasena = e.widget
+            if txt_Contrasena.get() == '':
+                txt_Contrasena.insert(0, 'Contrasena')
+                txt_Contrasena.config(show="")
+
+        txt_Contrasena = Entry(frame, textvariable=Datos().set_contrasena, width=25, fg='black',bg='white', border=0, font=('Microsoft YaHei UI Light',11))
+        txt_Contrasena.place(x=25,y=370)
+        txt_Contrasena.insert(0, 'Contrasena')
+        txt_Contrasena.bind('<FocusIn>', on_enter)
+        txt_Contrasena.bind('<FocusOut>', on_leave)
+        Frame(frame, width=350, height=2, bg='black').place(x=25,y=397)
+
+        Button(frame, width=39, pady=7, text='Guardar', bg='#57a1f8', fg='white', border=0, command=lambda:nuevo_estudiante()).place(x=45,y=430)
 
         def nuevo_estudiante():
             nombre = txt_Nombre.get()
@@ -320,7 +402,7 @@ def ventana_principal():
             usuario = txt_Usuario.get()
             contrasena = txt_Contrasena.get()
 
-             # Comprobar si todos los campos están llenos
+                # Comprobar si todos los campos están llenos
             if nombre and apellido and usuario and contrasena:
                 cursor = connection.cursor()
 
@@ -331,55 +413,112 @@ def ventana_principal():
                 messagebox.showinfo("Registro Exitoso", "El alumno ha sido registrado correctamente.")
                 # Cerrar la ventana de registro después de registrar al profesor
                 llenar_tabla()
-                register_window.destroy()
+                new_student.destroy()
             except pyodbc.Error as e:
                 messagebox.showerror("Error", "Ocurrió un error al registrar al alumno.")
 
             else:
                 messagebox.showerror("Error", "Por favor, complete todos los campos.")
+    
+    def agregar_calificaciones():
+        
+        global login
+        global img
 
+        add_calificaciones=Toplevel(login)
+        add_calificaciones.title( ' Agregar Calificaciones ' )
+        add_calificaciones.geometry('925x600+300+200')
+        add_calificaciones.configure(bg="#fff" )
+        add_calificaciones.resizable (False, False)
+        utl.centrar_ventana( add_calificaciones, 925, 600)
 
+        img = PhotoImage(file='source/img/add-calificaciones.png')
+        Label(add_calificaciones, image=img, bg='white').place(x=50,y=60)
 
-        #marco 2
+        frame=Frame(add_calificaciones, width=400, height=550,bg='white')
+        frame.place(x=480,y=25)
 
-        #labels
-        marco_2= LabelFrame(ventana_2, text="Calificaciones del estudiante")
-        marco_2.place(x=50,y=300, width=400, height=250)
+        heading=Label(frame, text='Agregar Calificaciones', fg='#57a1f8',bg='white', font=('Microsoft YaHei UI Light',23,'bold'))
+        heading.place(x=5,y=5)
 
         def obtener_id_alumnos():
             cursor = connection.cursor()
             cursor.execute("SELECT id_alumnos FROM alumnos WHERE id_alumnos NOT IN (SELECT DISTINCT id_alumnos FROM calificaciones)")
             ids = cursor.fetchall()
             return [id[0] for id in ids]
+        
 
-        lbl_id_calificaciones =Label(marco_2, text="Id").grid(column=0, row=0, padx=5, pady=5)
-        txt_id_calificaciones =Entry(marco_2, textvariable=Datos().set_id_calificaciones)
-        txt_id_calificaciones.grid(column=1, row=0)
-
-        lbl_fk_id_alumnos = Label(marco_2, text="Id_alumnos").grid(column=0, row=0, padx=5, pady=5)
+        #ID
         ids_alumnos = obtener_id_alumnos()
-        txt_fk_id_alumnos = ttk.Combobox(marco_2, values=ids_alumnos, textvariable=Datos().set_fk_id_alumnos)
-        txt_fk_id_alumnos.grid(column=1, row=0)
+        txt_fk_id_alumnos  = ttk.Combobox(frame, values=ids_alumnos, textvariable=Datos().set_fk_id_alumnos, width=20, font=('Microsoft YaHei UI Light',11))
+        txt_fk_id_alumnos .place(x=85,y=100)
+        txt_fk_id_alumnos .insert(0, 'Id de alumnos')
 
-        lbl_Primer_examen =Label(marco_2, text="Primer Examen").grid(column=0, row=1, padx=5, pady=5)
-        txt_Primer_examen =Entry(marco_2, textvariable=Datos.set_primer_examen)
-        txt_Primer_examen.grid(column=1, row=1)
+        #Primer examen
+        def on_enter(e):
+            txt_Primer_examen.delete(0, 'end')
 
-        lbl_Segundo_examen =Label(marco_2, text="Segundo Examen").grid(column=0, row=2, padx=5, pady=5)
-        txt_Segundo_examen =Entry(marco_2, textvariable=Datos.set_segundo_examen)
-        txt_Segundo_examen.grid(column=1, row=2)
+        def on_leave(e):
+            name = txt_Primer_examen.get()
+            if name == '':
+                txt_Primer_examen.insert(0, 'Primer examen')
 
-        lbl_Tercer_examen =Label(marco_2, text="Tercer Examen").grid(column=0, row=3, padx=5, pady=5)
-        txt_Tercer_examen =Entry(marco_2, textvariable=Datos.set_tercer_examen)
-        txt_Tercer_examen.grid(column=1, row=3)
+        txt_Primer_examen = Entry(frame, textvariable=Datos.set_primer_examen, width=25, fg='black',bg='white', border=0, font=('Microsoft YaHei UI Light',11))
+        txt_Primer_examen.place(x=20,y=170)
+        txt_Primer_examen.insert(0, 'Primer examen')
+        txt_Primer_examen.bind('<FocusIn>', on_enter)
+        txt_Primer_examen.bind('<FocusOut>', on_leave)
+        Frame(frame, width=350, height=2, bg='black').place(x=20,y=197)
 
-        lbl_Examen_final =Label(marco_2, text="Examen Final").grid(column=0, row=4, padx=5, pady=5)
-        txt_Examen_final =Entry(marco_2, textvariable=Datos.set_examen_final)
-        txt_Examen_final.grid(column=1, row=4)
+       #Segundo examen
+        def on_enter(e):
+            txt_Segundo_examen.delete(0, 'end')
 
-        #botones marco 2
-        btnNuevo = Button(marco_2, text="Agregar", command=lambda:nuevo_calificacion())
-        btnNuevo.grid(column=0, row=5, pady=5, padx=5)
+        def on_leave(e):
+            name = txt_Segundo_examen.get()
+            if name == '':
+                txt_Segundo_examen.insert(0, 'Segundo examen')
+
+        txt_Segundo_examen = Entry(frame, textvariable=Datos.set_segundo_examen, width=25, fg='black',bg='white', border=0, font=('Microsoft YaHei UI Light',11))
+        txt_Segundo_examen.place(x=20,y=250)
+        txt_Segundo_examen.insert(0, 'Segundo examen')
+        txt_Segundo_examen.bind('<FocusIn>', on_enter)
+        txt_Segundo_examen.bind('<FocusOut>', on_leave)
+        Frame(frame, width=350, height=2, bg='black').place(x=20,y=277)
+
+        #Tercer examen
+        def on_enter(e):
+            txt_Tercer_examen.delete(0, 'end')
+
+        def on_leave(e):
+            name = txt_Tercer_examen.get()
+            if name == '':
+                txt_Tercer_examen.insert(0, 'Tercer examen')
+
+        txt_Tercer_examen = Entry(frame, textvariable=Datos.set_tercer_examen, width=25, fg='black',bg='white', border=0, font=('Microsoft YaHei UI Light',11))
+        txt_Tercer_examen.place(x=20,y=330)
+        txt_Tercer_examen.insert(0, 'Tercer examen')
+        txt_Tercer_examen.bind('<FocusIn>', on_enter)
+        txt_Tercer_examen.bind('<FocusOut>', on_leave)
+        Frame(frame, width=350, height=2, bg='black').place(x=20,y=357)
+
+        # Examen final
+        def on_enter(e):
+            txt_Examen_final.delete(0, 'end')
+
+        def on_leave(e):
+            name = txt_Examen_final.get()
+            if name == '':
+                txt_Examen_final.insert(0, 'Examen Final')
+
+        txt_Examen_final = Entry(frame, textvariable=Datos.set_examen_final, width=25, fg='black',bg='white', border=0, font=('Microsoft YaHei UI Light',11))
+        txt_Examen_final.place(x=20,y=410)
+        txt_Examen_final.insert(0, 'Examen Final')
+        txt_Examen_final.bind('<FocusIn>', on_enter)
+        txt_Examen_final.bind('<FocusOut>', on_leave)
+        Frame(frame, width=350, height=2, bg='black').place(x=20,y=437)
+
+        Button(frame, width=39, pady=7, text='Agregar', bg='#57a1f8', fg='white', border=0, command=lambda:nuevo_calificacion()).place(x=45,y=474)
 
         def nuevo_calificacion():
             id_alumno = txt_fk_id_alumnos.get()
@@ -399,15 +538,15 @@ def ventana_principal():
                 messagebox.showinfo("Registro Exitoso", "Las calificaciones ha sido registradas correctamente.")
                 llenar_tabla()
                 # Cerrar la ventana de registro después de registrar al profesor
-                register_window.destroy()
+                add_calificaciones.destroy()
             except pyodbc.Error as e:
                 messagebox.showerror("Error", "Ocurrió un error al registrar las calificaciones.")
 
             else:
                 messagebox.showerror("Error", "Por favor, complete todos los campos.")
 
-        ventana.mainloop()
-
+        add_calificaciones.mainloop()
+   
     #Funciones para mostrar y ocultar el boton de editar
     def ocultar_boton():
         btnModificar.grid_remove()
@@ -507,7 +646,7 @@ def ventana_register():
     entry_apellido.insert(0, 'Apellido')
     entry_apellido.bind('<FocusIn>', on_enter)
     entry_apellido.bind('<FocusOut>', on_leave)
-    Frame(frame2, width=350, height=2, bg='black').place(x=25,y=177)
+    Frame(frame2, width=350, height=2, bg='black').place(x=25,y=207)
 
     #usuario
     def on_enter(e):
@@ -547,7 +686,6 @@ def ventana_register():
     Frame(frame2, width=350, height=2, bg='black').place(x=25,y=337)
 
     Button(frame2, width=39, pady=7, text='Guardar', bg='#57a1f8', fg='white', border=0, command=registrar_profesor).place(x=45,y=370)
-
 
 def ventana_login():
     global login
