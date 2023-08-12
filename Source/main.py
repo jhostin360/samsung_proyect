@@ -9,9 +9,14 @@ import locale
 from tkinter import Tk, Label, Frame
 import pandas as pd
 import openpyxl
+import os
+import ventana_estudiante
 
 
 nombre_profesor = ""
+id_profesor_global = 0
+nombre_estudiante = ""
+id_estudiante_global = 0
 img = None
 
 def update_clock(label):
@@ -20,32 +25,54 @@ def update_clock(label):
     label.configure(text=now)
     label.after(1000, lambda: update_clock(label))
 
+def prueba(label):
+    global img
+
 def abrir_ventana_principal():
     global login  # Indicar que estamos usando la variable global
     login.withdraw()  # Oculta la ventana de inicio de sesión
     ventana_principal()  # Muestra la ventana principal
 
+def abrir_ventana_estudiante(i,n):
+    global login  # Indicar que estamos usando la variable global
+      # Oculta la ventana de inicio de sesión
+    # Llamar a la función ventana_estudiante()
+    ventana_estudiante.ventana_estudiante(i,n)
+
 def ventana_principal():
     global nombre_profesor
+    global login
+    global ventana
     #abrir ventana principal
-    ventana=Tk()
+    ventana = Tk()
     ventana.title("Gestion de Estudiantes - PROFESORES")
     ventana.geometry("1100x650")
     utl.centrar_ventana(ventana, 1100, 650)
     ventana.resizable(width=0, height=0)
 
     # Header
-    header_frame = Frame(ventana, bg='#57a1f8', height=100)
+    header_frame = Frame(ventana, bg='#2D6051', height=220)
     header_frame.pack(fill='x')
 
-    header_content = Frame(header_frame, bg='#57a1f8')
+    header_content = Frame(header_frame, bg='#2D6051')
     header_content.pack(fill='both', expand=True)
 
-    header_label_left = Label(header_content, text=f"Bienvenido, {nombre_profesor}", font=('Arial', 16), fg='white', bg='#57a1f8')
+    header_label_left = Label(header_content, text=f"Bienvenido, {nombre_profesor}", font=('Microsoft YaHei UI Light',18,'bold'), fg='white', bg='#2D6051')
     header_label_left.pack(side='left', padx=10, pady=10)
 
-    current_time_label = Label(header_content, text="", font=('Arial', 16), fg='white', bg='#57a1f8')
+    current_time_label = Label(header_content, text="", font=('Microsoft YaHei UI Light',18,'bold'), fg='white', bg='#2D6051')
     current_time_label.pack(side='right', padx=10, pady=10)
+
+    def cerrar_sesion():
+        # Preguntar si realmente desea cerrar sesión
+        respuesta = messagebox.askyesno("Cerrar Sesión", "¿Desea cerrar sesión?")
+        # Si el usuario hace clic en "Yes", cerrar la ventana actual (ventana principal)
+        if respuesta:
+            ventana.destroy()
+            ventana_login()
+
+    btn_cerrar_sesion = Button(ventana, text='Cerrar Sesion', bg='#dc3545', fg='white', border=0, cursor='hand2', command=cerrar_sesion)
+    btn_cerrar_sesion.place(x=820, y=20)
 
     # Actualizar la hora cada segundo
     update_clock(current_time_label)
@@ -97,6 +124,9 @@ def ventana_principal():
     def exportar_a_excel(workbook):
         # Guardar el archivo Excel
         workbook.save("datos_estudiantes.xlsx")
+        ruta_archivo = os.path.abspath("datos_estudiantes.xlsx")
+        os.startfile(ruta_archivo)
+
     def boton_exportar_click():
         workbook = llenar_tabla()  # Llenar la tabla y obtener el objeto workbook
         exportar_a_excel(workbook)
@@ -111,6 +141,7 @@ def ventana_principal():
         "foreground": "#000",
         "font":('Times', 11)
     }
+
     lbl_id_alumnos =Label(marco, text="ID:",**estilo_labels).grid(column=0, row=0, padx=5, pady=5)
     txt_id_alumnos =Entry(marco, textvariable="id_alumnos", state='readonly',**estilo_inputs)
     txt_id_alumnos.grid(column=1, row=0)
@@ -186,7 +217,7 @@ def ventana_principal():
     btnNuevo = Button(controls, width=23, pady=7, text='Agregar Estudiantes', bg='#57a1f8', fg='white', border=0, command=lambda:agregar_estudiante())
     btnNuevo.grid(column=6, row=0, pady=5, padx=5)
 
-    btnNuevoC = Button(controls, width=23, pady=7, text='Agregar Calificaciones', bg='#57a1f8', fg='white', border=0, command=lambda:agregar_calificaciones())
+    btnNuevoC = Button(controls, width=23, pady=7, text='Agregar Calificaciones', bg='#4898F6', fg='white', border=0, command=lambda:agregar_calificaciones())
     btnNuevoC.grid(column=6, row=1, pady=5, padx=5)
 
     btnModificar = Button(controls, width=23, pady=7, text='Modificar alumno', bg='#198754', fg='white', border=0, command=lambda:editar_estudiantes())
@@ -234,8 +265,15 @@ def ventana_principal():
 
     def llenar_tabla():
         vaciar_tabla()
-        sql = "SELECT alumnos.id_alumnos, nombre, apellido, sexo, Primer_examen, Segundo_examen, Tercer_examen, Examen_final, (Primer_examen + Segundo_examen + Tercer_examen + Examen_final) / 4 as Promedio FROM alumnos LEFT JOIN calificaciones ON alumnos.id_alumnos = calificaciones.id_alumnos"
-        cursor.execute(sql)
+        sql = """
+            SELECT alumnos.id_alumnos, nombre, apellido, sexo, Primer_examen, Segundo_examen, Tercer_examen, Examen_final, 
+                (Primer_examen + Segundo_examen + Tercer_examen + Examen_final) / 4 as Promedio 
+            FROM alumnos 
+            LEFT JOIN calificaciones ON alumnos.id_alumnos = calificaciones.id_alumnos
+            WHERE alumnos.fk_id_profesores = ?
+        """
+        cursor.execute(sql, (id_profesor_global,))
+
         filas = cursor.fetchall()
 
         # Crear un archivo Excel y una hoja
@@ -408,7 +446,7 @@ def ventana_principal():
 
             # Insertar el nuevo profesor en la base de datos
             try:
-                cursor.execute("INSERT INTO alumnos (nombre, apellido, sexo, usuario, contrasena) VALUES (?, ?, ?, ?, ?)", (nombre, apellido, sexo, usuario, contrasena))
+                cursor.execute("INSERT INTO alumnos (nombre, apellido, sexo, usuario, contrasena, fk_id_profesores) VALUES (?, ?, ?, ?, ?, ?)", (nombre, apellido, sexo, usuario, contrasena, id_profesor_global))
                 connection.commit()
                 messagebox.showinfo("Registro Exitoso", "El alumno ha sido registrado correctamente.")
                 # Cerrar la ventana de registro después de registrar al profesor
@@ -443,7 +481,7 @@ def ventana_principal():
 
         def obtener_id_alumnos():
             cursor = connection.cursor()
-            cursor.execute("SELECT id_alumnos FROM alumnos WHERE id_alumnos NOT IN (SELECT DISTINCT id_alumnos FROM calificaciones)")
+            cursor.execute("SELECT id_alumnos FROM alumnos WHERE id_alumnos NOT IN (SELECT DISTINCT id_alumnos FROM calificaciones) AND fk_id_profesores = ?", (id_profesor_global,))            
             ids = cursor.fetchall()
             return [id[0] for id in ids]
         
@@ -561,7 +599,6 @@ def ventana_principal():
     ocultar_boton()
     ventana.mainloop()
 
-
 def ventana_register():
 
     global register_window
@@ -593,7 +630,6 @@ def ventana_register():
 
         else:
             messagebox.showerror("Error", "Por favor, complete todos los campos.")
-
 
     register_window = Toplevel(login)
     register_window.title("Registro de Nuevo Profesor")
@@ -688,32 +724,51 @@ def ventana_register():
     Button(frame2, width=39, pady=7, text='Guardar', bg='#57a1f8', fg='white', border=0, command=registrar_profesor).place(x=45,y=370)
 
 def ventana_login():
+
     global login
-    
+    global register_window
+    global ventana
+
     def validar_login():
         global nombre_profesor
+        global id_profesor_global  # Agrega esta línea al comienzo de la función
+        
         # Obtener los datos ingresados por el usuario
         usuario = user.get()
         contrasena = code.get()
+        tipo_usuario = user_type.get()
 
         cursor = connection.cursor()
 
         # Realizar la consulta SQL para buscar el usuario ingresado
-        cursor.execute("SELECT usuario, contrasena, nombre, apellido FROM profesores WHERE usuario = ?", (usuario,))
-        resultado = cursor.fetchone()
+        cursor.execute("SELECT id_profesores, usuario, contrasena, nombre, apellido FROM profesores WHERE usuario = ?", (usuario,))
+        resultado_profesor = cursor.fetchone()
+
+        cursor.execute("SELECT usuario, contrasena, nombre, apellido, id_alumnos FROM alumnos WHERE usuario = ?", (usuario,))
+        resultado_alumno = cursor.fetchone()
 
         # Comprobar si se encontró el usuario
-        if resultado:
-            usuario_bd, contrasena_bd, nombre, apellido = resultado
+        if tipo_usuario == "Profesor" and resultado_profesor:
+            id_profesor, usuario_bd, contrasena_bd, nombre, apellido = resultado_profesor
             if contrasena == contrasena_bd:
                 nombre_profesor = nombre + " " + apellido  # Almacena el nombre del profesor en la variable global
+                id_profesor_global = id_profesor  # Asigna el id_profesor a la variable global
                 abrir_ventana_principal()
+            else:
+                messagebox.showerror("Error", "Contraseña incorrecta")
+        elif tipo_usuario == "Estudiante" and resultado_alumno:
+            usuario_bd, contrasena_bd, nombre, apellido, id_alumno = resultado_alumno
+            if contrasena == contrasena_bd:
+                # Almacena el nombre y el id del estudiante en las variables globales
+                nombre_estudiante = nombre + " " + apellido
+                id_estudiante_global = id_alumno
+                abrir_ventana_estudiante(id_estudiante_global, nombre_estudiante)
             else:
                 messagebox.showerror("Error", "Contraseña incorrecta")
         else:
             messagebox.showerror("Error", "Usuario no encontrado")
 
-    login=Tk()
+    login = Tk()
     login.title( ' Login ' )
     login.geometry('925x500+300+200')
     login.configure(bg="#fff" )
@@ -728,6 +783,14 @@ def ventana_login():
 
     heading=Label(frame, text='Iniciar Sesion', fg='#57a1f8',bg='white', font=('Microsoft YaHei UI Light',23,'bold'))
     heading.place(x=80,y=5)
+
+    # Agregar un Radiobutton para seleccionar el tipo de usuario
+    user_type = StringVar()
+    user_type.set("Profesor")
+    profesor_radio = Radiobutton(frame, text="Profesor", fg='black',bg='white', font=('Microsoft YaHei UI Light',11), variable=user_type, value="Profesor")
+    profesor_radio.place(x=75,y=204)
+    estudiante_radio = Radiobutton(frame, text="Alumno", fg='black',bg='white', font=('Microsoft YaHei UI Light',11), variable=user_type, value="Estudiante")
+    estudiante_radio.place(x=175,y=204)
 
     def on_enter(e):
         user.delete(0, 'end')
@@ -769,13 +832,15 @@ def ventana_login():
     Frame(frame, width=350, height=2, bg='black').place(x=25,y=177)
 
     #Button
-    Button(frame, width=39, pady=7, text='Iniciar Sesion', bg='#57a1f8', fg='white', border=0, command=validar_login).place(x=44,y=204)
-    label=Label(frame, text='No tienes una cuenta?', fg='black', bg='white', font=('Microsoft YaHei UI Light', 9))
-    label.place(x=75,y=270)
+    Button(frame, width=39, pady=7, text='Iniciar Sesion', bg='#57a1f8', fg='white', border=0, command=validar_login).place(x=44,y=270)
 
-    sign = Button(frame, width=7,text='Registrate', border=0, bg='white', cursor='hand2', fg='#57a1f8', command=ventana_register)
-    sign.place(x=210,y=270)
+    # label=Label(frame, text='No tienes una cuenta?', fg='black', bg='white', font=('Microsoft YaHei UI Light', 9))
+    # label.place(x=75,y=270)
+
+    # sign = Button(frame, width=7,text='Registrate', border=0, bg='white', cursor='hand2', fg='#57a1f8', command=ventana_register)
+    # sign.place(x=210,y=270)
 
     login.mainloop()
 # Llamada a la función para mostrar la ventana de inicio de sesión al inicio
-ventana_login()
+if __name__ == "__main__":
+    ventana_login()
