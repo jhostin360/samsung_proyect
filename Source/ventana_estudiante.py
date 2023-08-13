@@ -1,3 +1,4 @@
+import os
 import tkinter as tk
 from tkinter import ttk
 from tkinter import *
@@ -7,6 +8,8 @@ import main
 import util.generic as utl
 from tkinter import LabelFrame, PhotoImage, Label, Frame, messagebox
 from Conexion import *
+import openpyxl
+
 
 
 def ventana_estudiante(id_estudiante, nombre_estudiante):
@@ -169,30 +172,30 @@ def ventana_estudiante(id_estudiante, nombre_estudiante):
     marco2 = LabelFrame(frame, text="Mis Calificaciones", bg='white')
     marco2.place(x=5,y=250, width=400, height=150)
     
-    examen1_label = tk.Label(marco2, text='Examen 1: ',  bg='white', font=('Helvetica', 11))
+    examen1_label = tk.Label(marco2, text='Examen 1: ',  bg='white', font=('Helvetica', 10))
     examen1_label.place(x=5, y=15,)
     examen1_input = tk.Label(marco2, text=str(primer_examen), bg='white', bd=1, relief='solid', font=('Helvetica', 10, 'bold'))
-    examen1_input.place(x=85, y=15, width=26, height=26) 
+    examen1_input.place(x=78, y=15, width=26, height=26) 
 
-    examen2_label = tk.Label(marco2, text='Examen 2: ',  bg='white', font=('Helvetica', 11))
+    examen2_label = tk.Label(marco2, text='Examen 2: ',  bg='white', font=('Helvetica', 10))
     examen2_label.place(x=5, y=50,)
     examen2_input = tk.Label(marco2, text=str(segundo_examen), bg='white', bd=1, relief='solid', font=('Helvetica', 10, 'bold'))
-    examen2_input.place(x=85, y=50, width=26, height=26) 
+    examen2_input.place(x=78, y=50, width=26, height=26) 
 
-    examen3_label = tk.Label(marco2, text='Examen 3: ',  bg='white', font=('Helvetica', 11))
+    examen3_label = tk.Label(marco2, text='Examen 3: ',  bg='white', font=('Helvetica', 10))
     examen3_label.place(x=5, y=85,)
     examen3_input = tk.Label(marco2, text=str(tercer_examen), bg='white', bd=1, relief='solid', font=('Helvetica', 10, 'bold'))
-    examen3_input.place(x=85, y=85, width=26, height=26)
+    examen3_input.place(x=78, y=85, width=26, height=26)
 
-    final_label = tk.Label(marco2, text='Examen Final: ',  bg='white', font=('Helvetica', 11))
+    final_label = tk.Label(marco2, text='Examen Final: ',  bg='white', font=('Helvetica', 10))
     final_label.place(x=125, y=15,)
     final_input = tk.Label(marco2, text=str(examen_final), bg='white', bd=1, relief='solid', font=('Helvetica', 10, 'bold'))
-    final_input.place(x=227, y=15, width=26, height=26)
+    final_input.place(x=220, y=15, width=26, height=26)
 
-    promedio_label = tk.Label(marco2, text='Promedio: ',  bg='white', font=('Helvetica', 11))
+    promedio_label = tk.Label(marco2, text='Promedio: ',  bg='white', font=('Helvetica', 10))
     promedio_label.place(x=125, y=85,)
     promedio_input = tk.Label(marco2, text=str(promedio), bg='white', bd=1, relief='solid', font=('Helvetica', 10, 'bold'))
-    promedio_input.place(x=227, y=85, width=26, height=26)
+    promedio_input.place(x=220, y=85, width=26, height=26)
    
     img3 = PhotoImage(file='source/img/circular.png')
     label_img = Label(marco2, bg='white', image=img3)
@@ -201,6 +204,34 @@ def ventana_estudiante(id_estudiante, nombre_estudiante):
     literal = calcular_calificacion(promedio)
     literal_label = Label(marco2, text=literal, bg='white', fg='#57A1F8', font=('Helvetica', 44, 'bold'))
     literal_label.place(x=300, y=22)
+
+
+    boton_exportar_excel = Button(frame, pady=7, text='Exportar a Excel', bg='#2D6051', fg='white', border=0, cursor='hand2', command=lambda:exportar_excel(datos_estudiante))
+    boton_exportar_excel.place(x=75, y=413, width=250)
+
+    def exportar_excel(datos_estudiante):
+        id_alumno, nombre_alumno, apellido_alumno, usuario_alumno, contrasena_alumno, profesor, primer_examen, segundo_examen, tercer_examen, examen_final, promedio = datos_estudiante
+
+        workbook = openpyxl.Workbook()
+        sheet = workbook.active
+        sheet.title = "Datos Estudiante"
+
+        # Encabezados de las columnas
+        encabezados = ["ID", "Nombre", "Apellido", "Profesor", "Primer Examen", "Segundo Examen", "Tercer Examen", "Examen Final", "Promedio"]
+        sheet.append(encabezados)
+
+        # Agregar los datos del estudiante
+        fila_estudiante = [id_alumno, nombre_alumno, apellido_alumno, profesor, primer_examen, segundo_examen, tercer_examen, examen_final, promedio]
+        sheet.append(fila_estudiante)
+
+        # Guardar el archivo Excel
+        nombre_archivo = f"datos_de_{nombre_estudiante}.xlsx"
+        workbook.save(nombre_archivo)
+        ruta_archivo = os.path.abspath(f"datos_de_{nombre_estudiante}.xlsx")
+        os.startfile(ruta_archivo)
+
+        messagebox.showinfo("Exportar a Excel", f"Los datos se han exportado a {nombre_archivo}")
+
 
 
     # Elevar la ventana al frente al crearla
