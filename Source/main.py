@@ -25,19 +25,14 @@ def update_clock(label):
     label.configure(text=now)
     label.after(1000, lambda: update_clock(label))
 
-def prueba(label):
-    global img
 
 def abrir_ventana_principal():
-    global login  # Indicar que estamos usando la variable global
-    login.withdraw()  # Oculta la ventana de inicio de sesión
+    #login.withdraw()  # Oculta la ventana de inicio de sesión
     ventana_principal()  # Muestra la ventana principal
 
 def abrir_ventana_estudiante(i,n):
-    global login  # Indicar que estamos usando la variable global
-      # Oculta la ventana de inicio de sesión
-    # Llamar a la función ventana_estudiante()
     ventana_estudiante.ventana_estudiante(i,n)
+
 
 def ventana_principal():
     global nombre_profesor
@@ -69,10 +64,10 @@ def ventana_principal():
         # Si el usuario hace clic en "Yes", cerrar la ventana actual (ventana principal)
         if respuesta:
             ventana.destroy()
-            ventana_login()
+            # ventana_login()
 
     btn_cerrar_sesion = Button(ventana, text='Cerrar Sesion', bg='#dc3545', fg='white', border=0, cursor='hand2', command=cerrar_sesion)
-    btn_cerrar_sesion.place(x=820, y=20)
+    btn_cerrar_sesion.place(x=1011, y=625)
 
     # Actualizar la hora cada segundo
     update_clock(current_time_label)
@@ -793,11 +788,13 @@ def ventana_login():
     estudiante_radio.place(x=175,y=204)
 
     def on_enter(e):
-        user.delete(0, 'end')
+        user = e.widget
+        if user.get() == 'Usuario':
+            user.delete(0, 'end')
 
     def on_leave(e):
-        name = user.get()
-        if name == '':
+        user = e.widget
+        if user.get() == '':
             user.insert(0, 'Usuario')
 
     #User
