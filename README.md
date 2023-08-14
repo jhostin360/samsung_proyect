@@ -1,6 +1,6 @@
-# Proyecto Samsung
+# Sistema de gestión de notas (Proyecto Samsung)
 
-Este es un proyecto de ejemplo que involucra una aplicación para gestionar estudiantes y profesores en una institución educativa.
+Este es un proyecto que involucra una aplicación para gestionar estudiantes y profesores en una institución educativa.
 
 ## Características
 
@@ -8,6 +8,22 @@ Este es un proyecto de ejemplo que involucra una aplicación para gestionar estu
 - Asignación de estudiantes a profesores.
 - Registro y actualización de calificaciones.
 - Exportación de datos a Excel.
+
+## Interfaz Gráfica
+
+A continuación, se muestra una guía visual de la interfaz gráfica de la aplicación:
+
+### Pantalla de Inicio de Sesión
+
+![Pantalla de Inicio de Sesión](images/login.png)
+
+### Panel del Estudiante
+
+![Panel del Estudiante](images/student_panel.png)
+
+### Panel del Profesor
+
+![Panel del Profesor](images/teacher_panel.png)
 
 ## Requisitos
 
