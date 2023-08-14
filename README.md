@@ -1,6 +1,6 @@
-# Sistema de gestión de notas (Proyecto Samsung)
+# Sistema de Gestión Académica (Proyecto Samsung)
 
-Este es un proyecto que involucra una aplicación para gestionar estudiantes y profesores en una institución educativa.
+Este es un sistema de gestión académica diseñado para brindar a profesores y estudiantes una plataforma eficiente para administrar y acceder a la información relacionada con sus cursos y calificaciones. El sistema ofrece una interfaz gráfica intuitiva y fácil de usar que permite a los usuarios realizar diversas acciones de manera sencilla.
 
 ## Características
 
@@ -60,3 +60,6 @@ Este proyecto está bajo la Licencia MIT - consulta el archivo [LICENSE](LICENSE
 ## Contacto
 
 Si tienes preguntas o comentarios, no dudes en contactarme en lendofkeury@gmail.com.
+
+<hr/>
+Con esta aplicacion, simplificamos la administración académica y mejoramos la comunicación entre profesores y estudiantes. ¡Esperamos que encuentres esta herramienta útil y eficiente para tu entorno educativo!
