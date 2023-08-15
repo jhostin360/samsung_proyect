@@ -24,6 +24,8 @@ A continuación, se muestra una guía visual de la interfaz gráfica de la aplic
 ### Panel del Profesor
 
 ![Panel del Profesor](images/teacher_panel.png)
+![Agregar Estudiantes](images/add_student.png)
+![Agregar Calificaciones](images/add_notas.png)
 
 ## Requisitos
 
