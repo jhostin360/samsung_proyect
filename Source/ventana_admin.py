@@ -76,7 +76,7 @@ def ventana_admin():
     # Crear los frames para dividir la ventana
     frame1 = Frame(ventana_admin, bg='white', highlightthickness=1, highlightbackground="black")
     frame2 = Frame(ventana_admin, bg='white')
-    frame3 = Frame(ventana_admin, bg='white')
+    frame3 = Frame(ventana_admin, bg='white', highlightthickness=1, highlightbackground="black")
 
     # Configurar dimensiones y posiciones de los frames usando el método place
     frame1.place(x=10, y=10, width=650, height=380)
@@ -105,6 +105,12 @@ def ventana_admin():
     tree.heading("Usuario", text="Usuario")
     tree.heading("Contraseña", text="Contraseña")
     tree.heading("Cantidad Estudiantes", text="Cantidad Estudiantes")
+
+    tree.column("Nombre", width=180)
+    tree.column("Apellido", width=180)
+    tree.column("Usuario", width=180)
+    tree.column("Contraseña", width=180)
+    tree.column("Cantidad Estudiantes", width=180)
     tree.pack()
     cargar_datos()
 
@@ -115,6 +121,12 @@ def ventana_admin():
     tree_alumnos.heading("Usuario", text="Usuario")
     tree_alumnos.heading("Contraseña", text="Contraseña")
     tree_alumnos.heading("Profesor", text="Profesor")
+
+    tree_alumnos.column("Nombre",width=180)
+    tree_alumnos.column("Apellido", width=180)
+    tree_alumnos.column("Usuario",width=180)
+    tree_alumnos.column("Contraseña",width=180)
+    tree_alumnos.column("Profesor", width=180)
     tree_alumnos.pack()
     cargar_datos_alumnos()
 
@@ -127,6 +139,14 @@ def ventana_admin():
     tree_calificaciones.heading("Examen Final", text="Examen Final")
     tree_calificaciones.heading("Promedio", text="Promedio")
     tree_calificaciones.pack()
+    # Asignar el ancho exacto a cada columna (en píxeles)
+    tree_calificaciones.column("Nombre", width=150)
+    tree_calificaciones.column("Primer Examen", width=150 , anchor="center")
+    tree_calificaciones.column("Segundo Examen", width=150 , anchor="center")
+    tree_calificaciones.column("Tercer Examen", width=150 , anchor="center")
+    tree_calificaciones.column("Examen Final", width=150 , anchor="center")
+    tree_calificaciones.column("Promedio", width=150 , anchor="center")
+    # Empaquetar la tabla
     cargar_datos_calificaciones()
 
     # Configurar pesos para que frame3 ocupe el espacio restante
