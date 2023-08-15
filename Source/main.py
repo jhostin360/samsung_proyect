@@ -11,12 +11,14 @@ import pandas as pd
 import openpyxl
 import os
 import ventana_estudiante
+import ventana_admin
 
 
 nombre_profesor = ""
 id_profesor_global = 0
 nombre_estudiante = ""
 id_estudiante_global = 0
+id_admin_global = 0
 img = None
 
 def update_clock(label):
@@ -32,6 +34,9 @@ def abrir_ventana_principal():
 
 def abrir_ventana_estudiante(i,n):
     ventana_estudiante.ventana_estudiante(i,n)
+
+def abrir_ventana_admin():
+    ventana_admin.ventana_admin()
 
 
 def ventana_principal():
@@ -742,6 +747,9 @@ def ventana_login():
         cursor.execute("SELECT usuario, contrasena, nombre, apellido, id_alumnos FROM alumnos WHERE usuario = ?", (usuario,))
         resultado_alumno = cursor.fetchone()
 
+        cursor.execute("SELECT usuario, contrasena, nombre, apellido, id_admin FROM admin WHERE usuario = ?", (usuario,))
+        resultado_admin = cursor.fetchone()
+
         # Comprobar si se encontró el usuario
         if tipo_usuario == "Profesor" and resultado_profesor:
             id_profesor, usuario_bd, contrasena_bd, nombre, apellido = resultado_profesor
@@ -758,6 +766,13 @@ def ventana_login():
                 nombre_estudiante = nombre + " " + apellido
                 id_estudiante_global = id_alumno
                 abrir_ventana_estudiante(id_estudiante_global, nombre_estudiante)
+            else:
+                messagebox.showerror("Error", "Contraseña incorrecta")
+        elif tipo_usuario == "Admin" and resultado_admin:
+            usuario_bd, contrasena_bd, nombre, apellido, id_admin = resultado_admin
+            if contrasena == contrasena_bd:
+                id_admin_global = id_admin
+                abrir_ventana_admin()
             else:
                 messagebox.showerror("Error", "Contraseña incorrecta")
         else:
@@ -783,9 +798,11 @@ def ventana_login():
     user_type = StringVar()
     user_type.set("Profesor")
     profesor_radio = Radiobutton(frame, text="Profesor", fg='black',bg='white', font=('Microsoft YaHei UI Light',11), variable=user_type, value="Profesor")
-    profesor_radio.place(x=75,y=204)
+    profesor_radio.place(x=43,y=204)
     estudiante_radio = Radiobutton(frame, text="Alumno", fg='black',bg='white', font=('Microsoft YaHei UI Light',11), variable=user_type, value="Estudiante")
-    estudiante_radio.place(x=175,y=204)
+    estudiante_radio.place(x=143,y=204)
+    admin_radio = Radiobutton(frame, text="Admin", fg='black',bg='white', font=('Microsoft YaHei UI Light',11), variable=user_type, value="Admin")
+    admin_radio.place(x=243,y=204)
 
     def on_enter(e):
         user = e.widget
