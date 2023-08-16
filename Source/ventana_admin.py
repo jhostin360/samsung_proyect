@@ -2,7 +2,7 @@ import os
 from tkinter import *
 from tkinter import ttk
 import tkinter as tk
-
+from tkinter import Canvas
 import openpyxl
 import util.generic as utl
 from tkinter import LabelFrame, PhotoImage, Label, Frame, messagebox
@@ -26,7 +26,7 @@ def ventana_admin():
         """
         cursor.execute(query)
         profesores = cursor.fetchall()
-
+        obtener_cantidad_profesores()
         # Borrar los registros actuales de la tabla
         for item in tree.get_children():
             tree.delete(item)
@@ -168,9 +168,62 @@ def ventana_admin():
                 tree.delete(seleccionado)
 
                 messagebox.showinfo("Éxito", f"Profesor {nombre_profesor} eliminado correctamente.")
+                obtener_cantidad_profesores()
             except Exception as e:
                 connection.rollback()
                 messagebox.showerror("Error", f"No se pudo eliminar al profesor: {str(e)}")
+
+    def obtener_cantidad_profesores():
+        try:
+            # Establecer la conexión con la base de datos
+            cursor = connection.cursor()
+            
+            # Consulta SQL para obtener la cantidad de profesores
+            query = "SELECT COUNT(*) FROM profesores"
+            cursor.execute(query)
+            
+            # Obtener el resultado y retornar la cantidad de profesores
+            cantidad_profesores = cursor.fetchone()[0]
+            return cantidad_profesores
+            
+        except pyodbc.Error as e:
+            print("Error en la conexión a la base de datos:", e)
+            return 0  # Si hay un error, retornar 0 profesores
+
+    def obtener_cantidad_estudiantes():
+        try:
+            # Establecer la conexión con la base de datos
+            cursor = connection.cursor()
+            
+            # Consulta SQL para obtener la cantidad de estudiantes
+            query = "SELECT COUNT(*) FROM alumnos"
+            cursor.execute(query)
+            
+            # Obtener el resultado y retornar la cantidad de estudiantes
+            cantidad_estudiantes = cursor.fetchone()[0]
+            return cantidad_estudiantes
+            
+        except pyodbc.Error as e:
+            print("Error en la conexión a la base de datos:", e)
+            return 0  # Si hay un error, retornar 0 estudiantes
+
+    def obtener_promedio_calificaciones():
+        try:
+            # Establecer la conexión con la base de datos
+            cursor = connection.cursor()
+            
+            # Consulta SQL para obtener el promedio de calificaciones
+            query = "SELECT AVG(Primer_examen + Segundo_examen + Tercer_examen + Examen_final) / 4 FROM calificaciones"
+            cursor.execute(query)
+            
+            # Obtener el resultado y retornar el promedio de calificaciones
+            promedio_calificaciones = cursor.fetchone()[0]
+            return promedio_calificaciones
+            
+        except pyodbc.Error as e:
+            print("Error en la conexión a la base de datos:", e)
+            return None
+
 
     ventana_admin = tk.Toplevel()
     ventana_admin.title('Ventana Administradores')
@@ -189,6 +242,30 @@ def ventana_admin():
     frame1.place(x=10, y=10, width=700, height=380)
     frame2.place(x=720, y=10, width=570, height=380)
     frame3.place(x=10, y=400, width=1230, height=280)
+
+    #circular
+
+    cantidad_profesores = obtener_cantidad_profesores()  # Debes implementar esta función
+    cantidad_estudiantes = obtener_cantidad_estudiantes()
+    promedio_calificaciones = obtener_promedio_calificaciones()
+
+    canvas1 = Canvas(frame1, bg='white')
+    canvas1.place(x=10, y=135, width=200, height=200)
+    texto1 = canvas1.create_text(100,90, text=str(cantidad_profesores), font=('Helvetica', 44, 'bold'))
+    texto_canvas1 = canvas1.create_text(100, 130, text='Profesores', font=('Helvetica', 14, 'bold'))
+    circulo1 = canvas1.create_oval(10, 10, 190, 190, outline='#57a1f8', width=8)
+
+    canvas2 = Canvas(frame1, bg='white')
+    canvas2.place(x=255, y=135, width=200, height=200)
+    texto2 = canvas2.create_text(100,90, text=str(cantidad_estudiantes), font=('Helvetica', 44, 'bold'))
+    texto_canvas2 = canvas2.create_text(100, 130, text='Estudiantes', font=('Helvetica', 14, 'bold'))
+    circulo2 = canvas2.create_oval(10, 10, 190, 190, outline='#57a1f8', width=8)
+
+    canvas3 = Canvas(frame1, bg='white')
+    canvas3.place(x=500, y=135, width=200, height=200)
+    texto3 = canvas3.create_text(100,90, text=str(promedio_calificaciones), font=('Helvetica', 44, 'bold'))
+    texto_canvas3 = canvas3.create_text(100, 130, text='Promedio', font=('Helvetica', 14, 'bold'))
+    circulo3 = canvas3.create_oval(10, 10, 190, 190, outline='#57a1f8', width=8)
 
     #Image principal
     img = PhotoImage(file='source/img/admin.png')
@@ -224,10 +301,10 @@ def ventana_admin():
     img_excel_tab1 = PhotoImage(file='source/img/sheets.png')
     export_excel_tab1 = Button(tab1, image=img_excel_tab1, bd=0, bg='white', cursor='hand2', command=exportar_a_excel_profesores).place(x=1165,y=185)
 
-    btneliminar = Button(frame1, width=26, pady=6, text='Eliminar Profesor', bg='#dc3545', fg='white', border=0, cursor='hand2', command=lambda:eliminar_profesor_seleccionado())
-    btneliminar.place(x=80, y=350)
-    btrefres = Button(frame1, width=26, pady=6, text='Refrescar', bg='#ffc107', fg='white', border=0, cursor='hand2', command=lambda:cargar_datos())
-    btrefres.place(x=280, y=350)
+    btneliminar = Button(frame1, width=30, pady=6, text='Eliminar Profesor', bg='#dc3545', fg='white', border=0, cursor='hand2', command=lambda:eliminar_profesor_seleccionado())
+    btneliminar.place(x=10, y=350)
+    btrefres = Button(frame1, width=30, pady=6, text='Refrescar', bg='#ffc107', fg='white', border=0, cursor='hand2', command=lambda:cargar_datos())
+    btrefres.place(x=245, y=350)
     btnNuevo = Button(frame1, width=33, pady=6, text='Agregar Nuevo Profesor', bg='#57a1f8', fg='white', border=0, cursor='hand2', command=lambda:main.ventana_register())
     btnNuevo.place(x=480, y=350)
 
