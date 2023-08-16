@@ -32,7 +32,7 @@ def ventana_admin():
             tree.delete(item)
 
         for profesor in profesores:
-            tree.insert("", "end", values=(profesor[0], profesor[1], profesor[2], profesor[3], profesor[4]))
+            tree.insert("", "end", values=(profesor[0], profesor[1], profesor[2], profesor[3], profesor[4],))
 
     def cargar_datos_alumnos():
 
@@ -144,6 +144,33 @@ def ventana_admin():
         ruta_archivo = os.path.abspath("calificaciones.xlsx")
         os.startfile(ruta_archivo)
 
+    def eliminar_profesor_seleccionado():
+        seleccionado = tree.selection()
+        if not seleccionado:
+            messagebox.showinfo("Información", "No hay profesor seleccionado.")
+            return
+
+        nombre_profesor = tree.item(seleccionado, "values")[0]
+        apellido_profesor = tree.item(seleccionado, "values")[1]
+        respuesta = messagebox.askyesno("Confirmación", f"¿Desea eliminar a {nombre_profesor} {apellido_profesor}?")
+
+        if respuesta:
+            cursor = connection.cursor()
+            try:
+                # Obtenemos el nombre del profesor desde la fila seleccionada
+                nombre_profesor = tree.item(seleccionado, "values")[0]
+
+                # Ejecutamos la consulta para eliminar el profesor
+                cursor.execute("DELETE FROM profesores WHERE nombre = ?", (nombre_profesor,))
+                connection.commit()
+
+                # Eliminamos la fila seleccionada de la tabla
+                tree.delete(seleccionado)
+
+                messagebox.showinfo("Éxito", f"Profesor {nombre_profesor} eliminado correctamente.")
+            except Exception as e:
+                connection.rollback()
+                messagebox.showerror("Error", f"No se pudo eliminar al profesor: {str(e)}")
 
     ventana_admin = tk.Toplevel()
     ventana_admin.title('Ventana Administradores')
@@ -197,6 +224,8 @@ def ventana_admin():
     img_excel_tab1 = PhotoImage(file='source/img/sheets.png')
     export_excel_tab1 = Button(tab1, image=img_excel_tab1, bd=0, bg='white', cursor='hand2', command=exportar_a_excel_profesores).place(x=1165,y=185)
 
+    btneliminar = Button(frame1, width=26, pady=6, text='Eliminar Profesor', bg='#dc3545', fg='white', border=0, cursor='hand2', command=lambda:eliminar_profesor_seleccionado())
+    btneliminar.place(x=80, y=350)
     btrefres = Button(frame1, width=26, pady=6, text='Refrescar', bg='#ffc107', fg='white', border=0, cursor='hand2', command=lambda:cargar_datos())
     btrefres.place(x=280, y=350)
     btnNuevo = Button(frame1, width=33, pady=6, text='Agregar Nuevo Profesor', bg='#57a1f8', fg='white', border=0, cursor='hand2', command=lambda:main.ventana_register())
