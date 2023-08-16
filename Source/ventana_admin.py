@@ -1,6 +1,9 @@
+import os
 from tkinter import *
 from tkinter import ttk
 import tkinter as tk
+
+import openpyxl
 import util.generic as utl
 from tkinter import LabelFrame, PhotoImage, Label, Frame, messagebox
 from Conexion import *
@@ -30,9 +33,6 @@ def ventana_admin():
 
         for profesor in profesores:
             tree.insert("", "end", values=(profesor[0], profesor[1], profesor[2], profesor[3], profesor[4]))
-
-
- 
 
     def cargar_datos_alumnos():
 
@@ -73,7 +73,31 @@ def ventana_admin():
             
             # Insertar en la tabla
             tree_calificaciones.insert("", "end", values=(nombre_completo, primer_examen, segundo_examen, tercer_examen, examen_final, promedio))
-            
+
+    def exportar_a_excel_profesores():
+        # Crear un nuevo libro de trabajo de Excel
+        libro = openpyxl.Workbook()
+        hoja = libro.active
+
+        # Agregar encabezados de columna
+        encabezados = ["Nombre", "Apellido", "Usuario", "Contraseña", "Cantidad Estudiantes"]
+        hoja.append(encabezados)
+
+        # Obtener datos de la tabla de profesores
+        datos = []
+        for item in tree.get_children():
+            valores = tree.item(item, 'values')
+            datos.append(valores)
+
+        # Agregar los datos a la hoja de Excel
+        for dato in datos:
+            hoja.append(dato)
+
+        # Guardar el libro de trabajo
+        libro.save("profesores.xlsx")
+        ruta_archivo = os.path.abspath("profesores.xlsx")
+        os.startfile(ruta_archivo)
+
     ventana_admin = tk.Toplevel()
     ventana_admin.title('Ventana Administradores')
     ventana_admin.geometry('1250x700')
@@ -124,7 +148,7 @@ def ventana_admin():
     cargar_datos()
 
     img_excel_tab1 = PhotoImage(file='source/img/sheets.png')
-    export_excel_tab1 = Button(tab1, image=img_excel_tab1, bd=0, bg='white', cursor='hand2').place(x=1165,y=185)
+    export_excel_tab1 = Button(tab1, image=img_excel_tab1, bd=0, bg='white', cursor='hand2', command=exportar_a_excel_profesores).place(x=1165,y=185)
 
     btrefres = Button(frame1, width=26, pady=6, text='Refrescar', bg='#ffc107', fg='white', border=0, cursor='hand2', command=lambda:cargar_datos())
     btrefres.place(x=280, y=350)
