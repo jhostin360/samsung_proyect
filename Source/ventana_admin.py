@@ -4,7 +4,8 @@ import tkinter as tk
 import util.generic as utl
 from tkinter import LabelFrame, PhotoImage, Label, Frame, messagebox
 from Conexion import *
-
+#from ventana_nuevo_profesor import ventana_register
+import main
 
 
 def ventana_admin():
@@ -23,8 +24,15 @@ def ventana_admin():
         cursor.execute(query)
         profesores = cursor.fetchall()
 
+        # Borrar los registros actuales de la tabla
+        for item in tree.get_children():
+            tree.delete(item)
+
         for profesor in profesores:
             tree.insert("", "end", values=(profesor[0], profesor[1], profesor[2], profesor[3], profesor[4]))
+
+
+ 
 
     def cargar_datos_alumnos():
 
@@ -68,20 +76,21 @@ def ventana_admin():
             
     ventana_admin = tk.Toplevel()
     ventana_admin.title('Ventana Administradores')
-    ventana_admin.geometry('1200x700')
+    ventana_admin.geometry('1250x700')
     ventana_admin.configure(bg="#fff")
     ventana_admin.resizable(False, False)
-    utl.centrar_ventana(ventana_admin, 1200, 700)
+    utl.centrar_ventana(ventana_admin, 1250, 700)
 
     # Crear los frames para dividir la ventana
-    frame1 = Frame(ventana_admin, bg='white', highlightthickness=1, highlightbackground="black")
+    #frame1 = Frame(ventana_admin, bg='white', highlightthickness=1, highlightbackground="black")
+    frame1 = Frame(ventana_admin, bg='white')
     frame2 = Frame(ventana_admin, bg='white')
-    frame3 = Frame(ventana_admin, bg='white', highlightthickness=1, highlightbackground="black")
+    frame3 = Frame(ventana_admin, bg='white')
 
     # Configurar dimensiones y posiciones de los frames usando el método place
-    frame1.place(x=10, y=10, width=650, height=380)
-    frame2.place(x=670, y=10, width=520, height=380)
-    frame3.place(x=10, y=400, width=1180, height=280)
+    frame1.place(x=10, y=10, width=700, height=380)
+    frame2.place(x=720, y=10, width=570, height=380)
+    frame3.place(x=10, y=400, width=1230, height=280)
 
     #Image principal
     img = PhotoImage(file='source/img/admin.png')
@@ -106,13 +115,18 @@ def ventana_admin():
     tree.heading("Contraseña", text="Contraseña")
     tree.heading("Cantidad Estudiantes", text="Cantidad Estudiantes")
 
-    tree.column("Nombre", width=180)
-    tree.column("Apellido", width=180)
-    tree.column("Usuario", width=180)
-    tree.column("Contraseña", width=180)
-    tree.column("Cantidad Estudiantes", width=180)
+    tree.column("Nombre", width=240)
+    tree.column("Apellido", width=240)
+    tree.column("Usuario", width=240)
+    tree.column("Contraseña", width=240)
+    tree.column("Cantidad Estudiantes", width=240)
     tree.pack()
     cargar_datos()
+
+    btrefres = Button(frame1, width=26, pady=6, text='Refrescar', bg='#ffc107', fg='white', border=0, cursor='hand2', command=lambda:cargar_datos())
+    btrefres.place(x=280, y=350)
+    btnNuevo = Button(frame1, width=33, pady=6, text='Agregar Nuevo Profesor', bg='#57a1f8', fg='white', border=0, cursor='hand2', command=lambda:main.ventana_register())
+    btnNuevo.place(x=480, y=350)
 
     # Tabla para mostrar alumnos y su profesor
     tree_alumnos = ttk.Treeview(tab2, columns=("Nombre", "Apellido", "Usuario", "Contraseña", "Profesor"), show="headings")
@@ -122,11 +136,11 @@ def ventana_admin():
     tree_alumnos.heading("Contraseña", text="Contraseña")
     tree_alumnos.heading("Profesor", text="Profesor")
 
-    tree_alumnos.column("Nombre",width=180)
-    tree_alumnos.column("Apellido", width=180)
-    tree_alumnos.column("Usuario",width=180)
-    tree_alumnos.column("Contraseña",width=180)
-    tree_alumnos.column("Profesor", width=180)
+    tree_alumnos.column("Nombre",width=240)
+    tree_alumnos.column("Apellido", width=240)
+    tree_alumnos.column("Usuario",width=240)
+    tree_alumnos.column("Contraseña",width=240)
+    tree_alumnos.column("Profesor", width=240)
     tree_alumnos.pack()
     cargar_datos_alumnos()
 
@@ -140,12 +154,12 @@ def ventana_admin():
     tree_calificaciones.heading("Promedio", text="Promedio")
     tree_calificaciones.pack()
     # Asignar el ancho exacto a cada columna (en píxeles)
-    tree_calificaciones.column("Nombre", width=150)
-    tree_calificaciones.column("Primer Examen", width=150 , anchor="center")
-    tree_calificaciones.column("Segundo Examen", width=150 , anchor="center")
-    tree_calificaciones.column("Tercer Examen", width=150 , anchor="center")
-    tree_calificaciones.column("Examen Final", width=150 , anchor="center")
-    tree_calificaciones.column("Promedio", width=150 , anchor="center")
+    tree_calificaciones.column("Nombre", width=200)
+    tree_calificaciones.column("Primer Examen", width=200 , anchor="center")
+    tree_calificaciones.column("Segundo Examen", width=200 , anchor="center")
+    tree_calificaciones.column("Tercer Examen", width=200 , anchor="center")
+    tree_calificaciones.column("Examen Final", width=200 , anchor="center")
+    tree_calificaciones.column("Promedio", width=200 , anchor="center")
     # Empaquetar la tabla
     cargar_datos_calificaciones()
 

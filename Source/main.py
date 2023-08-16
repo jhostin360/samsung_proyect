@@ -631,7 +631,7 @@ def ventana_register():
         else:
             messagebox.showerror("Error", "Por favor, complete todos los campos.")
 
-    register_window = Toplevel(login)
+    register_window = Toplevel()
     register_window.title("Registro de Nuevo Profesor")
     register_window.geometry('925x500+300+200')
     register_window.configure(bg="#fff" )
@@ -682,7 +682,7 @@ def ventana_register():
     entry_apellido.insert(0, 'Apellido')
     entry_apellido.bind('<FocusIn>', on_enter)
     entry_apellido.bind('<FocusOut>', on_leave)
-    Frame(frame2, width=350, height=2, bg='black').place(x=25,y=207)
+    Frame(frame2, width=350, height=2, bg='black').place(x=25,y=177)
 
     #usuario
     def on_enter(e):
