@@ -27,6 +27,11 @@ A continuación, se muestra una guía visual de la interfaz gráfica de la aplic
 ![Agregar Estudiantes](images/add_student.png)
 ![Agregar Calificaciones](images/add_notas.png)
 
+### Panel de Administradores
+
+![Agregar Profesores](images/add_teacher.png)
+
+
 ## Requisitos
 
 - Python 3.6 o superior
