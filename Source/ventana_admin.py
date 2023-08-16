@@ -123,6 +123,9 @@ def ventana_admin():
     tree.pack()
     cargar_datos()
 
+    img_excel_tab1 = PhotoImage(file='source/img/sheets.png')
+    export_excel_tab1 = Button(tab1, image=img_excel_tab1, bd=0, bg='white', cursor='hand2').place(x=1165,y=185)
+
     btrefres = Button(frame1, width=26, pady=6, text='Refrescar', bg='#ffc107', fg='white', border=0, cursor='hand2', command=lambda:cargar_datos())
     btrefres.place(x=280, y=350)
     btnNuevo = Button(frame1, width=33, pady=6, text='Agregar Nuevo Profesor', bg='#57a1f8', fg='white', border=0, cursor='hand2', command=lambda:main.ventana_register())
@@ -144,6 +147,10 @@ def ventana_admin():
     tree_alumnos.pack()
     cargar_datos_alumnos()
 
+    img_excel_tab2 = PhotoImage(file='source/img/sheets.png')
+    export_excel_tab2 = Button(tab2, image=img_excel_tab2, bd=0, bg='white', cursor='hand2')
+    export_excel_tab2.place(x=1165,y=185)
+
     # Tabla para mostrar calificaciones y nombre/apellido de estudiantes
     tree_calificaciones = ttk.Treeview(tab3, columns=("Nombre", "Primer Examen", "Segundo Examen", "Tercer Examen", "Examen Final", "Promedio"), show="headings")
     tree_calificaciones.heading("Nombre", text="Nombre")
@@ -162,6 +169,10 @@ def ventana_admin():
     tree_calificaciones.column("Promedio", width=200 , anchor="center")
     # Empaquetar la tabla
     cargar_datos_calificaciones()
+
+    img_excel_tab3 = PhotoImage(file='source/img/sheets.png')
+    export_excel_tab3 = Button(tab3, image=img_excel_tab2, bd=0, bg='white', cursor='hand2')
+    export_excel_tab3.place(x=1165,y=185)
 
     # Configurar pesos para que frame3 ocupe el espacio restante
     ventana_admin.grid_rowconfigure(0, weight=1)
