@@ -121,6 +121,30 @@ def ventana_admin():
         ruta_archivo = os.path.abspath("alumnos.xlsx")
         os.startfile(ruta_archivo)
 
+    def exportar_a_excel_calificaciones():
+        libro = openpyxl.Workbook()
+        hoja = libro.active
+
+        # Agregar encabezados de columna
+        encabezados = ["Nombre", "Primer Examen", "Segundo Examen", "Tercer Examen", "Examen Final", "Promedio"]
+        hoja.append(encabezados)
+
+        # Obtener datos de la tabla de calificaciones
+        datos = []
+        for item in tree_calificaciones.get_children():
+            valores = tree_calificaciones.item(item, 'values')
+            datos.append(valores)
+
+        # Agregar los datos a la hoja de Excel
+        for dato in datos:
+            hoja.append(dato)
+
+        # Guardar el libro de trabajo
+        libro.save("calificaciones.xlsx")
+        ruta_archivo = os.path.abspath("calificaciones.xlsx")
+        os.startfile(ruta_archivo)
+
+
     ventana_admin = tk.Toplevel()
     ventana_admin.title('Ventana Administradores')
     ventana_admin.geometry('1250x700')
@@ -218,7 +242,7 @@ def ventana_admin():
     cargar_datos_calificaciones()
 
     img_excel_tab3 = PhotoImage(file='source/img/sheets.png')
-    export_excel_tab3 = Button(tab3, image=img_excel_tab2, bd=0, bg='white', cursor='hand2')
+    export_excel_tab3 = Button(tab3, image=img_excel_tab2, bd=0, bg='white', cursor='hand2', command=exportar_a_excel_calificaciones)
     export_excel_tab3.place(x=1165,y=185)
 
     # Configurar pesos para que frame3 ocupe el espacio restante
