@@ -35,8 +35,8 @@ def abrir_ventana_principal():
 def abrir_ventana_estudiante(i,n):
     ventana_estudiante.ventana_estudiante(i,n)
 
-def abrir_ventana_admin():
-    ventana_admin.ventana_admin()
+def abrir_ventana_admin(name):
+    ventana_admin.ventana_admin(name)
 
 
 def ventana_principal():
@@ -772,7 +772,8 @@ def ventana_login():
             usuario_bd, contrasena_bd, nombre, apellido, id_admin = resultado_admin
             if contrasena == contrasena_bd:
                 id_admin_global = id_admin
-                abrir_ventana_admin()
+                nombre_apellido_admin_global = f"{nombre} {apellido}"
+                abrir_ventana_admin(nombre_apellido_admin_global)
             else:
                 messagebox.showerror("Error", "Contraseña incorrecta")
         else:

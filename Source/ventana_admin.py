@@ -15,7 +15,7 @@ import datetime
 from datetime import date
 
 
-def ventana_admin():
+def ventana_admin(nombre):
 
     def cargar_datos():
 
@@ -247,6 +247,13 @@ def ventana_admin():
     frame2.place(x=720, y=10, width=570, height=380)
     frame3.place(x=10, y=400, width=1230, height=280)
 
+    #Bienvenida
+
+    bienvenida_label = Label(frame1, text="Bienvenida,", font=('Helvetica',20,'bold'), fg='#57a1f8', bg='white')
+    bienvenida_label.place(x=10, y=5)
+    name_label = Label(frame1, text=nombre, font=('Helvetica',20,'bold'), fg='#57a1f8', bg='white')
+    name_label.place(x=10, y=35)
+
     #cerrar sesion
 
     def cerrar_sesion():
@@ -281,7 +288,7 @@ def ventana_admin():
 
     current_time_label = Label(frame1, text="", font=('Helvetica',20,'bold'), fg='#57a1f8', bg='white')
     current_time_label.pack(padx=10, pady=5)
-    current_time_label.place(x=585, y=40)
+    current_time_label.place(x=585, y=35)
 
     update_clock(current_time_label)
     get_date(current_day_label)
