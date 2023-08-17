@@ -1,4 +1,6 @@
+import locale
 import os
+import time
 from tkinter import *
 from tkinter import ttk
 import tkinter as tk
@@ -9,6 +11,8 @@ from tkinter import LabelFrame, PhotoImage, Label, Frame, messagebox
 from Conexion import *
 #from ventana_nuevo_profesor import ventana_register
 import main
+import datetime
+from datetime import date
 
 
 def ventana_admin():
@@ -243,8 +247,34 @@ def ventana_admin():
     frame2.place(x=720, y=10, width=570, height=380)
     frame3.place(x=10, y=400, width=1230, height=280)
 
-    #circular
+    #Hora y fecha
 
+    def update_clock(label):
+        locale.setlocale(locale.LC_TIME, "es_ES")
+        now = time.strftime("%H:%M:%S")
+        label.configure(text=now)
+        label.after(1000, lambda: update_clock(label))
+
+    def get_date(label):
+        datetime_object = datetime.datetime.now()
+        week_day = datetime_object.strftime("%A")
+
+        today = date.today()
+        d1 = week_day + ',' + today.strftime("%d/%m/%Y")
+        label.configure( text=d1 )
+
+    current_day_label = Label(frame1, text="", font=('Helvetica',20,'bold'), fg='#57a1f8', bg='white')
+    current_day_label.pack(padx=10, pady=5)
+    current_day_label.place(x=422, y=5)
+
+    current_time_label = Label(frame1, text="", font=('Helvetica',20,'bold'), fg='#57a1f8', bg='white')
+    current_time_label.pack(padx=10, pady=5)
+    current_time_label.place(x=585, y=40)
+
+    update_clock(current_time_label)
+    get_date(current_day_label)
+
+    #circular
     cantidad_profesores = obtener_cantidad_profesores()  # Debes implementar esta función
     cantidad_estudiantes = obtener_cantidad_estudiantes()
     promedio_calificaciones = obtener_promedio_calificaciones()
