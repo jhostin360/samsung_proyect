@@ -249,6 +249,14 @@ def ventana_admin():
     cantidad_estudiantes = obtener_cantidad_estudiantes()
     promedio_calificaciones = obtener_promedio_calificaciones()
 
+    def getColorPromedio(p):
+        if p > 90:
+            return '#00CC27'
+        if p > 80:
+            return '#ffc107'
+        else:
+            return '#dc3545'
+
     canvas1 = Canvas(frame1, bg='white')
     canvas1.place(x=10, y=135, width=200, height=200)
     texto1 = canvas1.create_text(100,90, text=str(cantidad_profesores), font=('Helvetica', 44, 'bold'))
@@ -265,7 +273,7 @@ def ventana_admin():
     canvas3.place(x=500, y=135, width=200, height=200)
     texto3 = canvas3.create_text(100,90, text=str(promedio_calificaciones), font=('Helvetica', 44, 'bold'))
     texto_canvas3 = canvas3.create_text(100, 130, text='Promedio', font=('Helvetica', 14, 'bold'))
-    circulo3 = canvas3.create_oval(10, 10, 190, 190, outline='#57a1f8', width=8)
+    circulo3 = canvas3.create_oval(10, 10, 190, 190, outline=getColorPromedio(promedio_calificaciones), width=8)
 
     #Image principal
     img = PhotoImage(file='source/img/admin.png')
