@@ -247,6 +247,18 @@ def ventana_admin():
     frame2.place(x=720, y=10, width=570, height=380)
     frame3.place(x=10, y=400, width=1230, height=280)
 
+    #cerrar sesion
+
+    def cerrar_sesion():
+        respuesta = messagebox.askyesno("Cerrar Sesión", "¿Estás seguro que quieres cerrar la sesión?")
+        if respuesta:
+            ventana_admin.destroy() 
+
+    img2 = tk.PhotoImage(file='source/img/apagar.png')
+    boton_cerrar_sesion = Label(ventana_admin, image=img2, bg='white', cursor='hand2')
+    boton_cerrar_sesion.place(x=1200, y=5)
+    boton_cerrar_sesion.bind("<Button-1>", lambda e: cerrar_sesion())
+
     #Hora y fecha
 
     def update_clock(label):
