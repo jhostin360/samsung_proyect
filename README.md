@@ -29,6 +29,7 @@ A continuación, se muestra una guía visual de la interfaz gráfica de la aplic
 
 ### Panel de Administradores
 
+![Panel del administrador](images/admin_panel.png)
 ![Agregar Profesores](images/add_teacher.png)
 
 
